@@ -1,172 +1,146 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FC Cyber Manager Pro</title>
-    <style>
-        :root {
-            --bg: #0a0b10;
-            --card-bg: #161821;
-            --accent: #00e676;
-            --text: #ffffff;
-            --muted: #a0a0a0;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
-        
-        .header { background: linear-gradient(180deg, #1a1d29 0%, #161821 100%); padding: 20px; border-bottom: 1px solid #2d3142; display: flex; justify-content: space-between; }
-        .stat-box { text-align: center; }
-        .stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
-        .stat-label { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
-
-        .container { padding: 20px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .section-header { font-size: 14px; font-weight: 600; color: var(--muted); margin: 25px 0 15px; border-bottom: 1px solid #2d3142; padding-bottom: 5px; text-transform: uppercase; }
-        
-        .player-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        
-        .card { background: var(--card-bg); border-radius: 12px; padding: 12px; display: flex; align-items: center; border: 1px solid #2d3142; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .card.empty { border-style: dashed; border-color: #3d4256; justify-content: center; color: #4d546d; height: 70px; }
-        
-        .avatar { width: 45px; height: 45px; border-radius: 8px; margin-right: 15px; background: #252a3d; }
-        .info { flex-grow: 1; }
-        .name { font-weight: 600; font-size: 14px; }
-        .rating { font-size: 12px; color: var(--accent); font-weight: bold; }
-        
-        .actions { display: flex; gap: 5px; }
-        .btn-small { background: #2d3142; color: #fff; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; transition: 0.2s; }
-        .btn-small:hover { background: #3d4256; }
-        
-        .btn-main { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
-        
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161821; border-top: 1px solid #2d3142; display: flex; justify-content: space-around; padding: 15px 0; }
-        .nav-item { color: var(--muted); cursor: pointer; font-size: 11px; text-align: center; }
-        .nav-item.active { color: var(--accent); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FC Cyber Manager Pro</title>
+<style>
+:root {
+--bg: #0a0b10;
+--card-bg: #161821;
+--accent: #00e676;
+--text: #ffffff;
+--muted: #a0a0a0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background-color: var(--bg); color: var(--text); padding-bottom: 90px; }
+.header { background: linear-gradient(180deg, #1a1d29 0%, #161821 100%); padding: 20px; border-bottom: 1px solid #2d3142; display: flex; justify-content: space-between; }
+.stat-box { text-align: center; }
+.stat-value { font-size: 18px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 10px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
+.container { padding: 20px; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.section-header { font-size: 14px; font-weight: 600; color: var(--muted); margin: 25px 0 15px; border-bottom: 1px solid #2d3142; padding-bottom: 5px; text-transform: uppercase; }
+.player-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.card { background: var(--card-bg); border-radius: 12px; padding: 12px; display: flex; align-items: center; border: 1px solid #2d3142; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+.card.empty { border-style: dashed; border-color: #3d4256; justify-content: center; color: #4d546d; height: 70px; }
+.avatar { width: 45px; height: 45px; border-radius: 8px; margin-right: 15px; background: #252a3d; }
+.info { flex-grow: 1; }
+.name { font-weight: 600; font-size: 14px; }
+.rating { font-size: 12px; color: var(--accent); font-weight: bold; }
+.actions { display: flex; gap: 5px; }
+.btn-small { background: #2d3142; color: #fff; border: none; padding: 5px 8px; border-radius: 6px; font-size: 10px; cursor: pointer; }
+.btn-main { background: var(--accent); color: #000; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer; }
+.bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161821; border-top: 1px solid #2d3142; display: flex; justify-content: space-around; padding: 15px 0; }
+.nav-item { color: var(--muted); cursor: pointer; font-size: 11px; text-align: center; }
+.nav-item.active { color: var(--accent); }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="stat-box"><div class="stat-label">Бюджет</div><div id="coins" class="stat-value">1000</div></div>
-        <div class="stat-box"><div class="stat-label">Рейтинг</div><div id="team-rating" class="stat-value">0</div></div>
-    </div>
-    
-    <div class="container">
-        <div id="tab-home" class="tab-content active">
-            <h2 style="margin-bottom: 20px;">Dashboard</h2>
-            <button class="btn-main" onclick="playMatch()">ИГРАТЬ МАТЧ (+150)</button>
-        </div>
-
-        <div id="tab-team" class="tab-content">
-            <div class="section-header">Основной состав</div>
-            <div id="starters" class="player-grid"></div>
-            <div class="section-header">Запас (7 мест)</div>
-            <div id="bench" class="player-grid"></div>
-            <div class="section-header">Резерв</div>
-            <div id="reserve" class="player-grid"></div>
-        </div>
-
-        <div id="tab-transfers" class="tab-content">
-            <div class="section-header">Трансферный рынок</div>
-            <div id="market" class="player-grid"></div>
-        </div>
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)">Главная</div>
-        <div class="nav-item" onclick="switchTab('team', this)">Команда</div>
-        <div class="nav-item" onclick="switchTab('transfers', this)">Рынок</div>
-    </div>
-
-    <script>
-        let state = JSON.parse(localStorage.getItem('gameData')) || { coins: 1000, team: [], market: [] };
-        const firstNames = ["Иван", "Марко", "Бруно", "Андрей", "Сергей", "Дмитрий", "Павел", "Виктор", "Алексей", "Николай"];
-        const lastNames = ["Иванов", "Гарсия", "Лука", "Смирнов", "Петров", "Сидоров", "Васильев", "Морозов"];
-        const countries = ["🇷🇺", "🇧🇷", "🇦🇷", "🇫🇷", "🇩🇪", "🇪🇸", "🏴󠁧󠁢󠁥󠁮󠁧󠁿"];
-
-        function createPlayer() {
-            return {
-                id: Math.random().toString(36).substr(2, 9),
-                name: firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)],
-                rating: Math.floor(Math.random() * (92 - 65 + 1)) + 65,
-                country: countries[Math.floor(Math.random() * countries.length)],
-                price: Math.floor(Math.random() * 500) + 200,
-                status: 'reserve'
-            };
-        }
-
-        if (state.team.length === 0) {
-            for (let i = 0; i < 12; i++) {
-                let p = createPlayer();
-                if(i < 11) p.status = 'start';
-                else if(i === 11) p.status = 'bench';
-                state.team.push(p);
-            }
-        }
-        if (state.market.length === 0) for (let i = 0; i < 4; i++) state.market.push(createPlayer());
-
-        function save() { localStorage.setItem('gameData', JSON.stringify(state)); render(); }
-        function movePlayer(id, status) { state.team.find(x => x.id === id).status = status; save(); }
-        function playMatch() { state.coins += 150; save(); }
-        
-        function render() {
-            document.getElementById('coins').innerText = state.coins;
-            const containers = { start: document.getElementById('starters'), bench: document.getElementById('bench'), reserve: document.getElementById('reserve') };
-            Object.values(containers).forEach(c => c.innerHTML = "");
-            
-            let totalRating = 0;
-            state.team.forEach(p => {
-                const card = `
-                    <div class="card">
-                        <img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${p.name}">
-                        <div class="info">
-                            <div class="name">${p.name} ${p.country}</div>
-                            <div class="rating">Rating: ${p.rating}</div>
-                        </div>
-                        <div class="actions">
-                            ${p.status !== 'start' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'start')">Основа</button>` : ''}
-                            ${p.status !== 'bench' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'bench')">Запас</button>` : ''}
-                            ${p.status !== 'reserve' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'reserve')">Резерв</button>` : ''}
-                        </div>
-                    </div>`;
-                containers[p.status].innerHTML += card;
-                if(p.status === 'start') totalRating += p.rating;
-            });
-            
-            // Запас пустые слоты
-            let bCount = state.team.filter(p => p.status === 'bench').length;
-            for(let i=0; i < (7 - bCount); i++) containers.bench.innerHTML += `<div class="card empty">Свободный слот</div>`;
-            
-            document.getElementById('team-rating').innerText = Math.round(totalRating / 11);
-            
-            const mCont = document.getElementById('market'); mCont.innerHTML = "";
-            state.market.forEach((p, i) => {
-                mCont.innerHTML += `
-                    <div class="card">
-                        <div class="info"><div class="name">${p.name}</div><div class="rating">Рейтинг: ${p.rating}</div></div>
-                        <button class="btn-small" style="background:var(--accent);color:#000" onclick="buy(${i})">Купить (${p.price})</button>
-                    </div>`;
-            });
-        }
-
-        function buy(i) {
-            if(state.coins >= state.market[i].price) {
-                state.coins -= state.market[i].price;
-                state.team.push(state.market[i]);
-                state.market.splice(i, 1);
-                save();
-            }
-        }
-
-        function switchTab(t, el) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('tab-' + t).classList.add('active');
-            el.classList.add('active');
-        }
-        render();
-    </script>
+<div class="header">
+<div class="stat-box"><div class="stat-label">Бюджет</div><div id="coins" class="stat-value">1000</div></div>
+<div class="stat-box"><div class="stat-label">Рейтинг</div><div id="team-rating" class="stat-value">0</div></div>
+</div>
+<div class="container">
+<div id="tab-home" class="tab-content active">
+<h2 style="margin-bottom: 20px;">Dashboard</h2>
+<button class="btn-main" onclick="playMatch()">ИГРАТЬ МАТЧ (+150)</button>
+</div>
+<div id="tab-team" class="tab-content">
+<div class="section-header">Основной состав</div>
+<div id="starters" class="player-grid"></div>
+<div class="section-header">Запас (7 мест)</div>
+<div id="bench" class="player-grid"></div>
+<div class="section-header">Резерв</div>
+<div id="reserve" class="player-grid"></div>
+</div>
+<div id="tab-transfers" class="tab-content">
+<div class="section-header">Трансферный рынок</div>
+<div id="market" class="player-grid"></div>
+</div>
+</div>
+<div class="bottom-nav">
+<div class="nav-item active" onclick="switchTab('home', this)">Главная</div>
+<div class="nav-item" onclick="switchTab('team', this)">Команда</div>
+<div class="nav-item" onclick="switchTab('transfers', this)">Рынок</div>
+</div>
+<script>
+let state = JSON.parse(localStorage.getItem('gameData')) || { coins: 1000, team: [], market: [] };
+const firstNames = ["Иван", "Марко", "Бруно", "Андрей", "Сергей", "Дмитрий", "Павел", "Виктор", "Алексей", "Николай"];
+const lastNames = ["Иванов", "Гарсия", "Лука", "Смирнов", "Петров", "Сидоров", "Васильев", "Морозов"];
+const countries = ["🇷🇺", "🇧🇷", "🇦🇷", "🇫🇷", "🇩🇪", "🇪🇸", "🏴󠁧󠁢󠁥󠁮󠁧󠁿"];
+function createPlayer() {
+return {
+id: Math.random().toString(36).substr(2, 9),
+name: firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)],
+rating: Math.floor(Math.random() * (92 - 65 + 1)) + 65,
+country: countries[Math.floor(Math.random() * countries.length)],
+price: Math.floor(Math.random() * 500) + 200,
+status: 'reserve'
+};
+}
+if (state.team.length === 0) {
+for (let i = 0; i < 12; i++) {
+let p = createPlayer();
+if(i < 11) p.status = 'start';
+else if(i === 11) p.status = 'bench';
+state.team.push(p);
+}
+}
+if (state.market.length === 0) for (let i = 0; i < 4; i++) state.market.push(createPlayer());
+function save() { localStorage.setItem('gameData', JSON.stringify(state)); render(); }
+function movePlayer(id, status) { state.team.find(x => x.id === id).status = status; save(); }
+function playMatch() { state.coins += 150; save(); }
+function render() {
+document.getElementById('coins').innerText = state.coins;
+const containers = { start: document.getElementById('starters'), bench: document.getElementById('bench'), reserve: document.getElementById('reserve') };
+Object.values(containers).forEach(c => c.innerHTML = "");
+let totalRating = 0;
+state.team.forEach(p => {
+const card = `
+<div class="card">
+<img class="avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${p.name}">
+<div class="info">
+<div class="name">${p.name} ${p.country}</div>
+<div class="rating">Rating: ${p.rating}</div>
+</div>
+<div class="actions">
+${p.status !== 'start' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'start')">Основа</button>` : ''}
+${p.status !== 'bench' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'bench')">Запас</button>` : ''}
+${p.status !== 'reserve' ? `<button class="btn-small" onclick="movePlayer('${p.id}', 'reserve')">Резерв</button>` : ''}
+</div>
+</div>`;
+containers[p.status].innerHTML += card;
+if(p.status === 'start') totalRating += p.rating;
+});
+let bCount = state.team.filter(p => p.status === 'bench').length;
+for(let i=0; i < (7 - bCount); i++) containers.bench.innerHTML += `<div class="card empty">Свободный слот</div>`;
+document.getElementById('team-rating').innerText = Math.round(totalRating / 11);
+const mCont = document.getElementById('market'); mCont.innerHTML = "";
+state.market.forEach((p, i) => {
+mCont.innerHTML += `
+<div class="card">
+<div class="info"><div class="name">${p.name}</div><div class="rating">Рейтинг: ${p.rating}</div></div>
+<button class="btn-small" style="background:var(--accent);color:#000" onclick="buy(${i})">Купить (${p.price})</button>
+</div>`;
+});
+}
+function buy(i) {
+if(state.coins >= state.market[i].price) {
+state.coins -= state.market[i].price;
+state.team.push(state.market[i]);
+state.market.splice(i, 1);
+save();
+}
+}
+function switchTab(t, el) {
+document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+document.getElementById('tab-' + t).classList.add('active');
+el.classList.add('active');
+}
+render();
+</script>
 </body>
 </html>
