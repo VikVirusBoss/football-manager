@@ -4,366 +4,98 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>My Football League</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; user-select: none; }
         body { background-color: #0d1117; color: #f8fafc; padding-bottom: 80px; }
-        
-        /* Шапка */
         .header { display: flex; justify-content: space-between; background: #161b22; padding: 15px; border-bottom: 1px solid #30363d; }
-        .stat-box { text-align: center; }
-        .stat-title { font-size: 10px; color: #8b949e; text-transform: uppercase; }
-        .stat-value { font-size: 16px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 4px;}
-        .coin-icon { width: 16px; height: 16px;}
-
+        .stat-value { font-size: 16px; font-weight: bold; color: #38bdf8; }
         .container { padding: 16px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* Заголовок команды и редактирование */
-        .team-title-row { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 15px; }
-        .team-title { font-size: 22px; font-weight: bold; color: #f8fafc; }
-        .btn-edit { background: #21262d; border: 1px solid #30363d; color: #38bdf8; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
-        .btn-edit:active { transform: scale(0.95); }
-
-        .section-title { font-size: 16px; margin: 15px 0 10px; font-weight: bold; color: #8b949e; }
+        .section-title { font-size: 16px; margin: 20px 0 10px; font-weight: bold; color: #8b949e; border-left: 3px solid #22c55e; padding-left: 8px; }
         .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        /* КАРТОЧКА ИГРОКА (с аватаркой) */
-        .fut-card { background: #161b22; border-radius: 12px; padding: 12px; border: 1px solid #30363d; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .fut-card.bench { opacity: 0.7;}
-        .fut-header { width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;}
-        .fut-info { display: flex; align-items: center; gap: 5px; }
-        .fut-rating { background: #eab308; color: #000; font-weight: bold; font-size: 11px; padding: 2px 5px; border-radius: 4px; }
-        .flag-icon { width: 18px; height: 13px; border-radius: 2px; }
-        
-        /* Аватар игрока (лица) */
-        .fut-avatar { width: 64px; height: 64px; border-radius: 50%; border: 3px solid #eab308; object-fit: cover;}
-        .fut-name { font-size: 14px; font-weight: bold; margin-top: 8px; color: #f8fafc;}
-
-        /* Поле матча */
-        #match-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; padding: 20px; }
-        .field { width: 100%; height: 100%; border: 3px solid rgba(255,255,255,0.7); border-radius: 10px; position: relative; background: #2d8a2d; box-shadow: 0 0 15px rgba(0,0,0,0.5);}
-        .center-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.3); }
-        
-        /* Игроки на поле (с аватарками) */
-        .player-dot { position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; transform: translate(-50%, -50%); overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
-        .player-field-avatar { width: 100%; height: 100%; object-fit: cover;}
-        .my-team { border-color: #38bdf8; }
-        .enemy-team { border-color: #ef4444; }
-
-        /* Навигация */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161b22; border-top: 1px solid #30363d; display: flex; justify-content: space-around; padding: 12px 0; z-index: 100; }
-        .nav-item { color: #8b949e; cursor: pointer; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;}
-        .nav-item.active { color: #22c55e; font-weight: bold;}
-        .nav-icon { font-size: 20px;}
-
-        .btn-primary { width: 100%; background: #22c55e; color: #000; padding: 15px; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; font-size: 16px;}
-        .btn-primary:active { transform: scale(0.98); background: #1db152; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #161b22; padding: 30px; border-radius: 20px; text-align: center; border: 2px solid #22c55e; max-width: 300px; }
+        .fut-card { background: #161b22; border-radius: 10px; padding: 10px; border: 1px solid #30363d; text-align: center; }
+        .fut-card.locked { background: #0d1117; border: 1px dashed #30363d; opacity: 0.6; }
+        .fut-rating { background: #eab308; color: #000; font-weight: bold; font-size: 10px; padding: 2px 4px; border-radius: 4px; display: inline-block; margin-bottom: 5px;}
+        .fut-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #eab308; display: block; margin: 0 auto; background: #222;}
+        .fut-name { font-size: 12px; margin-top: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161b22; border-top: 1px solid #30363d; display: flex; justify-content: space-around; padding: 12px 0; }
+        .nav-item { color: #8b949e; cursor: pointer; font-size: 12px; text-align: center;}
+        .nav-item.active { color: #22c55e;}
     </style>
 </head>
 <body>
-
     <div class="header">
-        <div class="stat-box"><div class="stat-title">Монеты</div><div class="stat-value" id="coins">1 000 <img src="https://img.icons8.com/emoji/48/coin-emoji.png" class="coin-icon"></div></div>
-        <div class="stat-box"><div class="stat-title">Рейтинг</div><div class="stat-value" id="rating">1 842</div></div>
+        <div><div style="font-size: 10px; color: #8b949e;">МОНЕТЫ</div><div class="stat-value">1 000</div></div>
+        <div><div style="font-size: 10px; color: #8b949e;">РЕЙТИНГ</div><div class="stat-value" id="team-rating">0</div></div>
     </div>
-
     <div class="container">
-        <!-- ГЛАВНАЯ -->
         <div id="tab-home" class="tab-content active">
-            <div class="team-title-row">
-                <span class="team-title" id="team-name">FC Cyber</span>
-                <button class="btn-edit" onclick="editTeamName()">✏️ Изменить</button>
-            </div>
-            <p style="color: #8b949e;">Добро пожаловать, Менеджер! Управляй своим составом и побеждай в матчах.</p>
-            <button class="btn-primary" onclick="startMatch()">⚽ Играть матч</button>
+            <div style="padding: 20px; text-align: center;"><h2>FC Cyber</h2><p>Твой клуб. Твой путь.</p></div>
         </div>
-
-        <!-- КОМАНДА -->
         <div id="tab-team" class="tab-content">
-            <div class="section-title">Основной состав (2)</div>
-            <div class="player-grid">
-                <!-- Карточка М. Гарсия с аватаркой -->
-                <div class="fut-card">
-                    <div class="fut-header">
-                        <div class="fut-info">
-                            <span class="fut-rating">88</span>
-                            <img class="flag-icon" src="https://flagcdn.com/24x18/es.png">
-                        </div>
-                    </div>
-                    <img id="avatar-garcia" class="fut-avatar" src="">
-                    <div class="fut-name">Марко Гарсия</div>
-                </div>
-                
-                <!-- Карточка А. Смирнов с аватаркой -->
-                <div class="fut-card">
-                    <div class="fut-header">
-                        <div class="fut-info">
-                            <span class="fut-rating">86</span>
-                            <img class="flag-icon" src="https://flagcdn.com/24x18/ru.png">
-                        </div>
-                    </div>
-                    <img id="avatar-smirnov" class="fut-avatar" src="">
-                    <div class="fut-name">Андрей Смирнов</div>
-                </div>
-            </div>
-            
-            <div class="section-title">Запасные (1)</div>
-            <div class="player-grid">
-                 <!-- Запасной Б. Лука с аватаркой -->
-                 <div class="fut-card bench">
-                    <div class="fut-header">
-                        <div class="fut-info">
-                            <span class="fut-rating">75</span>
-                            <img class="flag-icon" src="https://flagcdn.com/24x18/br.png">
-                        </div>
-                    </div>
-                    <img id="avatar-luka" class="fut-avatar" src="">
-                    <div class="fut-name">Бруно Лука</div>
-                </div>
-            </div>
-            
-            <p style="text-align: center; color: #8b949e; margin-top: 15px; font-size: 13px;">* Это демонстрационный состав. Полная команда будет доступна в следующем обновлении.</p>
+            <div class="section-title">Основной состав</div>
+            <div id="starters" class="player-grid"></div>
+            <div class="section-title">Запасные (Резерв)</div>
+            <div id="subs" class="player-grid"></div>
         </div>
-
-        <!-- ПРОФИЛЬ -->
-        <div id="tab-profile" class="tab-content">
-            <div class="section-title">Профиль Менеджера</div>
-            <p style="margin-top: 8px;">Команда: <b id="profile-team-name">FC Cyber</b></p>
-            <p style="margin-top: 4px;">Уровень: 1</p>
-        </div>
+        <div id="tab-profile" class="tab-content"><div class="section-title">Профиль</div><p>Игрок: Главный Тренер</p></div>
     </div>
-
-    <!-- ВИЗУАЛИЗАЦИЯ МАТЧА (с лицами на поле) -->
-    <div id="match-view">
-        <div class="field" onclick="closeMatch()">
-            <div class="center-line"></div>
-            <!-- Мои (синие) -->
-            <div class="player-dot my-team" style="top: 85%; left: 50%;"><img class="player-field-avatar" id="match-avatar-gk" src=""></div> <!-- GK -->
-            <div class="player-dot my-team" style="top: 70%; left: 20%;"><img class="player-field-avatar" id="match-avatar-df1" src=""></div> <!-- DF -->
-            <div class="player-dot my-team" style="top: 70%; left: 40%;"><img class="player-field-avatar" id="match-avatar-df2" src=""></div> <!-- DF -->
-            <div class="player-dot my-team" style="top: 70%; left: 60%;"><img class="player-field-avatar" id="match-avatar-df3" src=""></div> <!-- DF -->
-            <div class="player-dot my-team" style="top: 70%; left: 80%;"><img class="player-field-avatar" id="match-avatar-df4" src=""></div> <!-- DF -->
-            
-            <!-- Соперник (Красные) -->
-            <div class="player-dot enemy-team" style="top: 15%; left: 50%;"><img class="player-field-avatar" src="https://i.pravatar.cc/150?u=redgk"></div> <!-- GK -->
-            <div class="player-dot enemy-team" style="top: 30%; left: 30%;"><img class="player-field-avatar" src="https://i.pravatar.cc/150?u=redfw1"></div> <!-- FW -->
-            <div class="player-dot enemy-team" style="top: 30%; left: 70%;"><img class="player-field-avatar" src="https://i.pravatar.cc/150?u=redfw2"></div> <!-- FW -->
-        </div>
-    </div>
-
-    <!-- ОКНО РЕЗУЛЬТАТА -->
-    <div id="result-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: #22c55e; margin-bottom: 10px;">ПОБЕДА! 🎉</h2>
-            <h1 style="font-size: 20px; margin-bottom: 15px;" id="match-score">FC Cyber 2 — 1 Red Bulls</h1>
-            <button class="btn-primary" onclick="closeMatch()">Отлично</button>
-        </div>
-    </div>
-
-    <!-- НАВИГАЦИЯ -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">🏠</span>Главная</div>
-        <div class="nav-item" onclick="switchTab('team', this)"><span class="nav-icon">⚽</span>Команда</div>
-        <div class="nav-item" onclick="switchTab('profile', this)"><span class="nav-icon">👤</span>Профиль</div>
+        <div class="nav-item active" onclick="switchTab('home', this)">🏠<br>Главная</div>
+        <div class="nav-item" onclick="switchTab('team', this)">⚽<br>Команда</div>
+        <div class="nav-item" onclick="switchTab('profile', this)">👤<br>Профиль</div>
     </div>
-
     <script>
-        // Функция генерации аватарки лица на основе имени
-        function getPlayerAvatarUrl(playerName) {
-            // Используем pravatar.cc, имя служит уникальным сидом для генерации лица
-            return `https://i.pravatar.cc/150?u=${encodeURIComponent(playerName)}`;
-        }
+        const firstNames = ["Иван", "Марко", "Бруно", "Андрей", "Сергей", "Дмитрий", "Павел", "Виктор", "Алексей", "Николай"];
+        const lastNames = ["Иванов", "Гарсия", "Лука", "Смирнов", "Петров", "Сидоров", "Васильев", "Морозов"];
 
-        // Инициализация аватарок для карточек
-        document.getElementById('avatar-garcia').src = getPlayerAvatarUrl('Марко Гарсия');
-        document.getElementById('avatar-smirnov').src = getPlayerAvatarUrl('Андрей Смирнов');
-        document.getElementById('avatar-luka').src = getPlayerAvatarUrl('Бруно Лука');
-
-        // Инициализация аватарок для поля матча (Связываем их с карточками)
-        document.getElementById('match-avatar-gk').src = getPlayerAvatarUrl('Марко Лопес'); // Вратарь (GK)
-        document.getElementById('match-avatar-df1').src = getPlayerAvatarUrl('Алексей Иванов'); // Защитник 1 (DF)
-        document.getElementById('match-avatar-df2').src = getPlayerAvatarUrl('Карлос Диас'); // Защитник 2 (DF)
-        document.getElementById('match-avatar-df3').src = getPlayerAvatarUrl('Лука Модрич'); // Защитник 3 (DF)
-        document.getElementById('match-avatar-df4').src = getPlayerAvatarUrl('Андрей Смирнов'); // Защитник 4 (DF) - Взяли из основы
-
-        // Остальная логика
-        let currentTeamName = localStorage.getItem('userTeamName') || "FC Cyber";
-        
-        function updateTeamDisplay() {
-            document.getElementById('team-name').innerText = currentTeamName;
-            document.getElementById('profile-team-name').innerText = currentTeamName;
-        }
-
-        updateTeamDisplay();
-
-        function editTeamName() {
-            const newName = prompt("Введите новое название команды (на английском):", currentTeamName);
-            if (newName && newName.trim() !== "") {
-                currentTeamName = newName.trim();
-                localStorage.setItem('userTeamName', currentTeamName);
-                updateTeamDisplay();
+        function getTeam() {
+            let team = JSON.parse(localStorage.getItem('myTeam'));
+            if (!team) {
+                team = [];
+                for (let i = 0; i < 12; i++) {
+                    team.push({
+                        name: firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)],
+                        rating: Math.floor(Math.random() * (92 - 65 + 1)) + 65
+                    });
+                }
+                localStorage.setItem('myTeam', JSON.stringify(team));
             }
+            return team;
         }
 
-        function switchTab(tab, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
+        function render() {
+            const team = getTeam();
+            const startersCont = document.getElementById('starters');
+            const subsCont = document.getElementById('subs');
+            let totalRating = 0;
+            
+            // Основной состав
+            for(let i = 0; i < 11; i++) {
+                let p = team[i];
+                totalRating += p.rating;
+                startersCont.innerHTML += `<div class="fut-card"><span class="fut-rating">${p.rating}</span><img class="fut-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${p.name}"><div class="fut-name">${p.name}</div></div>`;
+            }
+            
+            // Запасные
+            // 1 активный
+            subsCont.innerHTML += `<div class="fut-card"><span class="fut-rating">${team[11].rating}</span><img class="fut-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=${team[11].name}"><div class="fut-name">${team[11].name}</div></div>`;
+            // 6 заблокированных
+            for(let i = 0; i < 6; i++) {
+                subsCont.innerHTML += `<div class="fut-card locked"><div class="fut-rating">🔒</div><div style="font-size: 24px; margin: 10px 0;">🔒</div><div class="fut-name">Закрыто</div></div>`;
+            }
+            
+            document.getElementById('team-rating').innerText = Math.round(totalRating / 11);
+        }
+
+        function switchTab(t, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('tab-' + t).classList.add('active');
             el.classList.add('active');
         }
-
-        function startMatch() {
-            document.getElementById('match-view').style.display = 'block';
-            setTimeout(() => {
-                const score1 = Math.floor(Math.random() * 3) + 2;
-                const score2 = Math.floor(Math.random() * score1);
-                document.getElementById('match-score').innerText = `${currentTeamName} ${score1} — ${score2} Red Bulls`;
-                document.getElementById('result-modal').style.display = 'flex';
-            }, 2500);
-        }
-
-        function closeMatch() {
-            document.getElementById('match-view').style.display = 'none';
-            document.getElementById('result-modal').style.display = 'none';
-        }
+        render();
     </script>
 </body>
 </html>
-        #match-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a472a; z-index: 200; padding: 20px; }
-        .field { width: 100%; height: 100%; border: 3px solid white; border-radius: 10px; position: relative; background: #2d8a2d; }
-        .center-line { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.3); }
-        .player-dot { position: absolute; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: bold; }
-        .my-team { background: #38bdf8; }
-        .enemy-team { background: #ef4444; }
-
-        /* Навигация */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: #161b22; border-top: 1px solid #30363d; display: flex; justify-content: space-around; padding: 12px 0; }
-        .nav-item { color: #8b949e; cursor: pointer; font-size: 12px; }
-        .nav-item.active { color: #22c55e; }
-
-        .btn-primary { width: 100%; background: #22c55e; color: #000; padding: 15px; border: none; border-radius: 12px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
-        .modal-content { background: #161b22; padding: 30px; border-radius: 20px; text-align: center; border: 1px solid #22c55e; }
-    </style>
-</head>
-<body>
-
-    <div class="header">
-        <div class="stat-box"><div class="stat-title">Монеты</div><div class="stat-value" id="coins">1 000 🪙</div></div>
-        <div class="stat-box"><div class="stat-title">Рейтинг</div><div class="stat-value" id="rating">1 842</div></div>
-    </div>
-
-    <div class="container">
-        <!-- ГЛАВНАЯ -->
-        <div id="tab-home" class="tab-content active">
-            <div class="team-title-row">
-                <span class="team-title" id="team-name">FC Cyber</span>
-                <button class="btn-edit" onclick="editTeamName()">✏️ Изменить</button>
-            </div>
-            
-            <button class="btn-primary" onclick="startMatch()">⚽ Играть матч</button>
-        </div>
-
-        <!-- КОМАНДА -->
-        <div id="tab-team" class="tab-content">
-            <div class="section-title">Основной состав (11)</div>
-            <div class="player-grid">
-                <div class="fut-card"><div class="fut-header"><span class="fut-rating">88</span><img class="flag-icon" src="https://flagcdn.com/24x18/es.png"></div><div class="fut-name">М. Гарсия</div></div>
-                <div class="fut-card"><div class="fut-header"><span class="fut-rating">86</span><img class="flag-icon" src="https://flagcdn.com/24x18/ru.png"></div><div class="fut-name">А. Смирнов</div></div>
-            </div>
-            <div class="section-title">Запасные (7)</div>
-            <div class="player-grid">
-                 <div class="fut-card" style="opacity: 0.7;"><div class="fut-header"><span class="fut-rating">75</span><img class="flag-icon" src="https://flagcdn.com/24x18/br.png"></div><div class="fut-name">Б. Лука</div></div>
-            </div>
-        </div>
-
-        <!-- ПРОФИЛЬ -->
-        <div id="tab-profile" class="tab-content">
-            <div class="section-title">Профиль Менеджера</div>
-            <p style="margin-top: 8px;">Команда: <b id="profile-team-name">FC Cyber</b></p>
-            <p style="margin-top: 4px;">Уровень: 1</p>
-        </div>
-    </div>
-
-    <!-- ВИЗУАЛИЗАЦИЯ МАТЧА -->
-    <div id="match-view">
-        <div class="field">
-            <div class="center-line"></div>
-            <!-- Схема 4-4-2 (Мои - синие) -->
-            <div class="player-dot my-team" style="bottom: 5%; left: 50%;">GK</div>
-            <div class="player-dot my-team" style="bottom: 15%; left: 20%;">DF</div>
-            <div class="player-dot my-team" style="bottom: 15%; left: 40%;">DF</div>
-            <div class="player-dot my-team" style="bottom: 15%; left: 60%;">DF</div>
-            <div class="player-dot my-team" style="bottom: 15%; left: 80%;">DF</div>
-            <!-- Соперник (Красные) -->
-            <div class="player-dot enemy-team" style="top: 5%; left: 50%;">GK</div>
-            <div class="player-dot enemy-team" style="top: 15%; left: 30%;">FW</div>
-            <div class="player-dot enemy-team" style="top: 15%; left: 70%;">FW</div>
-        </div>
-    </div>
-
-    <!-- ОКНО РЕЗУЛЬТАТА -->
-    <div id="result-modal" class="modal">
-        <div class="modal-content">
-            <h2 style="color: #22c55e; margin-bottom: 10px;">ПОБЕДА! 🎉</h2>
-            <h1 style="font-size: 20px; margin-bottom: 15px;" id="match-score">FC Cyber 2 — 1 Red Bulls</h1>
-            <button class="btn-primary" onclick="closeMatch()">Отлично</button>
-        </div>
-    </div>
-
-    <!-- НАВИГАЦИЯ -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)">🏠 Главная</div>
-        <div class="nav-item" onclick="switchTab('team', this)">⚽ Команда</div>
-        <div class="nav-item" onclick="switchTab('profile', this)">👤 Профиль</div>
-    </div>
-
-    <script>
-        let currentTeamName = localStorage.getItem('userTeamName') || "FC Cyber";
-        
-        function updateTeamDisplay() {
-            document.getElementById('team-name').innerText = currentTeamName;
-            document.getElementById('profile-team-name').innerText = currentTeamName;
-        }
-
-        updateTeamDisplay();
-
-        function editTeamName() {
-            const newName = prompt("Введите новое название команды (на английском):", currentTeamName);
-            if (newName && newName.trim() !== "") {
-                currentTeamName = newName.trim();
-                localStorage.setItem('userTeamName', currentTeamName);
-                updateTeamDisplay();
-            }
-        }
-
-        function switchTab(tab, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('tab-' + tab).classList.add('active');
-            el.classList.add('active');
-        }
-
-        function startMatch() {
-            document.getElementById('match-view').style.display = 'block';
-            setTimeout(() => {
-                const score1 = Math.floor(Math.random() * 3) + 2;
-                const score2 = Math.floor(Math.random() * score1);
-                document.getElementById('match-score').innerText = `${currentTeamName} ${score1} — ${score2} Red Bulls`;
-                document.getElementById('result-modal').style.display = 'flex';
-            }, 2000);
-        }
-
-        function closeMatch() {
-            document.getElementById('match-view').style.display = 'none';
-            document.getElementById('result-modal').style.display = 'none';
-        }
-    </script>
-</body>
-              </html>
-  
