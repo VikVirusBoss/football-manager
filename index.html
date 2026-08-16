@@ -3,149 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FC Cyber Manager Pro</title>
+    <title>My Football League - Clean Avatars</title>
     <style>
         :root {
-            --bg: #0b0e14;
-            --card: #161b22;
-            --border: #30363d;
-            --accent: #22c55e;
-            --text: #ffffff;
-            --muted: #8b949e;
-            
-            /* Цвета редкости */
-            --common: #71717a;
-            --rare: #3b82f6;
-            --epic: #a855f7;
-            --legendary: #eab308;
+            --bg-dark: #0b0e14;
+            --card-bg: #161b26;
+            --border-color: #262e3d;
+            --accent-green: #22c55e;
+            --accent-blue: #38bdf8;
+            --accent-yellow: #f59e0b;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 80px; user-select: none; }
+        body { background: var(--bg-dark); color: var(--text-main); padding-bottom: 80px; user-select: none; }
 
-        /* Верхняя панель */
-        .top-bar { display: flex; justify-content: space-around; padding: 12px; background: #11141c; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
-        .stat-box { text-align: center; }
-        .stat-val { font-size: 16px; font-weight: 800; color: var(--accent); }
-        .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
+        /* Шапка */
+        .header {
+            background: #111622;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-avatar { 
+            width: 38px; height: 38px; border-radius: 50%; background: #1e293b; 
+            border: 2px solid var(--accent-yellow); display: flex; align-items: center; 
+            justify-content: center; font-size: 20px; 
+        }
+        .user-title { font-size: 13px; font-weight: 800; }
+        .user-level { font-size: 11px; color: var(--text-muted); }
 
-        .container { padding: 15px; }
+        .currencies { display: flex; gap: 6px; font-size: 11px; font-weight: 700; }
+        .currency-item { background: #1a2232; padding: 4px 7px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 3px; }
+
+        .container { padding: 12px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* --- ФУТБОЛЬНОЕ ПОЛЕ (СТАДИОН) --- */
+        /* Шапка статистики */
+        .league-stats-header {
+            display: flex;
+            justify-content: space-around;
+            background: #111622;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        .stat-box-val { font-size: 16px; font-weight: 800; color: var(--accent-green); }
+        .stat-box-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+        /* Футбольное поле 11х11 (Схема 4-3-3) */
         .pitch {
-            width: 100%;
-            height: 380px;
-            background: linear-gradient(180deg, #14532d 0%, #166534 100%);
+            width: 100%; height: 380px;
+            background: linear-gradient(180deg, #11381e 0%, #174d29 100%);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 16px;
-            border: 3px solid #ffffff;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 25px rgba(0,0,0,0.5);
-            margin-bottom: 15px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px 10px;
+            padding: 12px 4px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
         }
+        .pitch-line { position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.25); }
+        .pitch-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70px; height: 70px; border: 1px solid rgba(255,255,255,0.25); border-radius: 50%; }
 
-        /* Разметка поля */
-        .pitch-line-center { position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: rgba(255,255,255,0.4); }
-        .pitch-circle-center { position: absolute; top: 50%; left: 50%; width: 90px; height: 90px; border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; transform: translate(-50%, -50%); }
-        .pitch-box-top { position: absolute; top: 0; left: 25%; width: 50%; height: 50px; border: 2px solid rgba(255,255,255,0.4); border-top: none; }
-        .pitch-box-bottom { position: absolute; bottom: 0; left: 25%; width: 50%; height: 50px; border: 2px solid rgba(255,255,255,0.4); border-bottom: none; }
-
-        /* Игроки на поле (Расстановка) */
-        .pitch-row { display: flex; justify-content: center; gap: 20px; z-index: 2; position: relative; }
-        .field-player { text-align: center; transition: all 0.3s ease; }
-        .field-avatar {
-            width: 48px; height: 48px; border-radius: 50%; background: #222733;
-            border: 2px solid #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 22px; margin: 0 auto 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        .pitch-row { display: flex; justify-content: space-around; z-index: 2; }
+        .player-dot { text-align: center; width: 60px; }
+        .dot-avatar {
+            width: 32px; height: 32px; border-radius: 50%; background: #1e293b;
+            border: 2px solid var(--accent-green); display: flex; align-items: center;
+            justify-content: center; font-size: 18px; margin: 0 auto;
         }
-        .field-name { font-size: 11px; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .field-role { font-size: 9px; color: #cbd5e1; text-transform: uppercase; }
-
-        /* Подсветка игрока с мячом */
-        .field-player.has-ball .field-avatar {
-            transform: scale(1.25);
-            border-color: #eab308;
-            box-shadow: 0 0 15px #eab308;
-        }
-
-        /* Мяч */
-        .ball {
-            position: absolute;
-            font-size: 20px;
-            z-index: 5;
-            transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Анимация ГОЛ */
-        .goal-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7); display: flex; justify-content: center;
-            align-items: center; font-size: 36px; font-weight: 900; color: #eab308;
-            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10;
-        }
-        .goal-overlay.show { opacity: 1; }
+        .dot-name { font-size: 9px; font-weight: bold; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dot-pos { font-size: 8px; color: var(--accent-blue); text-transform: uppercase; }
 
         /* Сетка карточек */
+        .section-title { font-size: 15px; font-weight: 800; margin: 14px 0 8px 0; display: flex; justify-content: space-between; align-items: center; }
         .player-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-        /* Карточка */
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-        .card.rarity-common { border-bottom: 4px solid var(--common); }
-        .card.rarity-rare { border-bottom: 4px solid var(--rare); }
-        .card.rarity-epic { border-bottom: 4px solid var(--epic); }
-        .card.rarity-legendary { border-bottom: 4px solid var(--legendary); box-shadow: 0 0 10px rgba(234, 179, 8, 0.2); }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-        .avatar-ring { width: 40px; height: 40px; border-radius: 50%; background: #222733; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--border); }
-        .rating-badge { background: #eab308; color: #000; font-weight: 900; font-size: 11px; padding: 2px 6px; border-radius: 6px; }
+        .card-header { display: flex; align-items: center; gap: 6px; }
+        .card-avatar { 
+            width: 34px; height: 34px; border-radius: 50%; background: #263140; 
+            border: 1px solid var(--accent-green); display: flex; align-items: center; 
+            justify-content: center; font-size: 18px; flex-shrink: 0; 
+        }
+        .rating-pill { background: var(--accent-yellow); color: #000; font-weight: 900; font-size: 11px; padding: 1px 5px; border-radius: 4px; }
+        .pos-title { color: var(--accent-blue); font-size: 9px; font-weight: 800; text-transform: uppercase; display: block; }
+        .card-name { font-size: 12px; font-weight: 700; margin: 4px 0; }
 
-        .pos-tag { font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase; }
-        .player-name { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .btn-card {
+            width: 100%; padding: 6px; border-radius: 6px; border: none;
+            font-size: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 6px;
+        }
+        .btn-buy { background: var(--accent-green); color: #000; }
+        .btn-sell { background: #334155; color: #f87171; border: 1px solid #475569; }
 
-        .stat-info { font-size: 11px; color: var(--muted); margin-top: 8px; display: flex; justify-content: space-between; }
-        .progress-bg { height: 5px; background: #090a0f; border-radius: 3px; margin-top: 4px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+        .btn-main {
+            width: 100%; padding: 12px; background: var(--accent-green);
+            color: #000; font-weight: 900; font-size: 14px; border: none;
+            border-radius: 10px; text-transform: uppercase; cursor: pointer; margin-top: 10px;
+        }
+        .btn-main:disabled { background: #334155; color: #64748b; }
 
-        /* Кнопки */
-        .btn-main { width: 100%; padding: 15px; background: var(--accent); color: #000; border: none; border-radius: 12px; font-size: 15px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-main:disabled { background: #30363d; color: #8b949e; cursor: not-allowed; }
-        .btn-small { background: #222733; color: #fff; border: 1px solid var(--border); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 8px; }
-
-        .log-box { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
+        /* Кошелек и Магазин */
+        .wallet-card {
+            background: #111622; border: 1px solid var(--border-color);
+            border-radius: 14px; padding: 16px; text-align: center; margin-bottom: 12px;
+        }
+        .wallet-balance { font-size: 26px; font-weight: 900; color: var(--accent-yellow); margin: 6px 0; }
+        .input-field {
+            width: 100%; padding: 10px; background: #1a2232; border: 1px solid var(--border-color);
+            border-radius: 8px; color: #fff; margin-bottom: 8px; font-size: 13px; outline: none;
+        }
 
         /* Нижнее меню */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #11141c; border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 10; }
-        .nav-item { color: var(--muted); font-size: 11px; text-align: center; cursor: pointer; flex-grow: 1; }
-        .nav-item.active { color: var(--accent); font-weight: bold; }
-        .nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: #111622;
+            border-top: 1px solid var(--border-color); display: flex; justify-space-around; align-items: center; z-index: 100;
+        }
+        .nav-tab { color: var(--text-muted); font-size: 10px; font-weight: 600; text-align: center; cursor: pointer; flex: 1; }
+        .nav-tab.active { color: var(--accent-green); }
+        .nav-tab-icon { font-size: 16px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="stat-box"><div id="coins" class="stat-val">1000</div><div class="stat-label">Монеты</div></div>
-        <div class="stat-box"><div id="league-pts" class="stat-val">0</div><div class="stat-label">Очки Лиги</div></div>
-        <div class="stat-box"><div id="team-rating" class="stat-val">0</div><div class="stat-label">Рейтинг</div></div>
+    <div class="header">
+        <div class="user-info">
+            <div class="user-avatar">👤</div>
+            <div>
+                <div class="user-title">Virus_Boss</div>
+                <div class="user-level">Уровень 48</div>
+            </div>
+        </div>
+        <div class="currencies">
+            <div class="currency-item">🪙 <span id="val-coins">1350</span></div>
+            <div class="currency-item">💎 <span id="val-gram">1005</span></div>
+            <div class="currency-item">⚡ <span id="val-energy">17/25</span></div>
+        </div>
     </div>
 
     <div class="container">
-        <div id="tab-home" class="tab-content active">
-            <div class="pitch" id="pitch-container">
-                <div class="pitch-line-center"></div>
-                <div class="pitch-circle-center"></div>
-                <div class="pitch-box-top"></div>
-                <div class="pitch-box-bottom"></div>
-                <div id="goal-banner" class="goal-overlay">ГОЛ! 🎉</div>
-                <div id="soccer-ball" class="ball">⚽</div>
+
+        <div id="tab-pitch" class="tab-content active">
+            <div class="league-stats-header">
+                <div>
+                    <div class="stat-box-val" id="disp-coins">1350</div>
+                    <div class="stat-box-lbl">Монеты</div>
+                </div>
+                <div>
+                    <div class="stat-box-val" id="disp-points">7</div>
+                    <div class="stat-box-lbl">Очки Лиги</div>
+                </div>
+                <div>
+                    <div class="stat-box-val" id="disp-rating">85</div>
+                    <div class="stat-box-lbl">Рейтинг</div>
+                </div>
+            </div>
+
+            <div class="pitch">
+                <div class="pitch-line"></div>
+                <div class="pitch-circle"></div>
 
                 <div class="pitch-row" id="row-att"></div>
                 <div class="pitch-row" id="row-mid"></div>
@@ -153,267 +192,232 @@
                 <div class="pitch-row" id="row-gk"></div>
             </div>
 
-            <button id="play-btn" class="btn-main" onclick="playAnimatedMatch()">Играть матч</button>
-            <div id="match-log" class="log-box">Нажмите кнопку, чтобы начать матч.</div>
+            <div id="match-status" style="text-align:center; font-size:12px; color:var(--text-muted); margin-top:8px;">
+                Нажмите кнопку для начала матча.
+            </div>
+            <button class="btn-main" id="btn-match" onclick="playMatch()">Играть матч (-1 ⚡)</button>
         </div>
 
-        <div id="tab-team" class="tab-content">
-            <div style="margin-bottom: 12px; font-weight: 700; font-size: 16px;">Основной состав</div>
-            <div id="squad" class="player-grid"></div>
+        <div id="tab-squad" class="tab-content">
+            <div class="section-title">Основной состав (11)</div>
+            <div class="player-grid" id="squad-grid"></div>
+
+            <div class="section-title">Запасные / Резерв</div>
+            <div class="player-grid" id="reserve-grid"></div>
         </div>
 
-        <div id="tab-transfers" class="tab-content">
-            <div style="margin-bottom: 12px; font-weight: 700; font-size: 16px;">Трансферный рынок</div>
-            <div id="market" class="player-grid"></div>
+        <div id="tab-market" class="tab-content">
+            <div class="section-title">
+                <span>Трансферный рынок</span>
+                <button onclick="refreshMarket()" style="background:none; border:none; color:var(--accent-blue); font-weight:700; cursor:pointer; font-size:12px;">Обновить 🔄</button>
+            </div>
+            <div class="player-grid" id="market-grid"></div>
         </div>
+
+        <div id="tab-wallet" class="tab-content">
+            <div class="section-title">Финансы и Переводы</div>
+            <div class="wallet-card">
+                <div style="font-size:11px; color:var(--text-muted);">Баланс GRAM</div>
+                <div class="wallet-balance"><span id="wallet-gram-val">1005.92</span> GRAM</div>
+                <div style="font-size:11px; color:var(--accent-green);">~ <span id="wallet-coins-equiv">1350</span> 🪙 Монет</div>
+            </div>
+
+            <div style="background:var(--card-bg); padding:14px; border-radius:12px; border:1px solid var(--border-color);">
+                <div style="font-size:13px; font-weight:700; margin-bottom:10px;">Перевод игроку (P2P)</div>
+                <input type="text" id="p2p-target" class="input-field" placeholder="ID игрока или @username">
+                <input type="number" id="p2p-amount" class="input-field" placeholder="Сумма перевода (🪙)">
+                <button class="btn-main" onclick="sendP2PTransfer()">Перевести монеты</button>
+            </div>
+        </div>
+
+        <div id="tab-shop" class="tab-content">
+            <div class="section-title">Магазин</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:28px;">⚡</div>
+                    <div style="font-weight:800; margin:4px 0; font-size:12px;">Восстановить энергию</div>
+                    <button class="btn-card btn-buy" onclick="buyEnergy()">+10 ⚡ за 100 🪙</button>
+                </div>
+                <div class="card" style="text-align:center;">
+                    <div style="font-size:28px;">🎁</div>
+                    <div style="font-weight:800; margin:4px 0; font-size:12px;">Золотой Набор</div>
+                    <button class="btn-card btn-buy" onclick="buyPack()">Купить за 300 🪙</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home', this)"><span class="nav-icon">⚔️</span>Поле</div>
-        <div class="nav-item" onclick="switchTab('team', this)"><span class="nav-icon">⚽</span>Команда</div>
-        <div class="nav-item" onclick="switchTab('transfers', this)"><span class="nav-icon">🛒</span>Рынок</div>
+    <div class="nav-bar">
+        <div class="nav-tab active" onclick="switchTab('pitch', this)"><span class="nav-tab-icon">⚔️</span>Поле</div>
+        <div class="nav-tab" onclick="switchTab('squad', this)"><span class="nav-tab-icon">⚽</span>Команда</div>
+        <div class="nav-tab" onclick="switchTab('market', this)"><span class="nav-tab-icon">🛒</span>Рынок</div>
+        <div class="nav-tab" onclick="switchTab('wallet', this)"><span class="nav-tab-icon">💎</span>Кошелек</div>
+        <div class="nav-tab" onclick="switchTab('shop', this)"><span class="nav-tab-icon">🏪</span>Магазин</div>
     </div>
 
     <script>
-        let state = JSON.parse(localStorage.getItem('fc_manager_pro_data')) || {
-            coins: 1000,
-            points: 0,
-            team: [
-                { id: "1", name: "А. Смирнов", pos: "Нападающий", statName: "Удар", value: 88, avatar: "👦🏽" },
-                { id: "2", name: "И. Иванов", pos: "Полузащитник", statName: "Пас", value: 82, avatar: "🧑🏼‍🦱" },
-                { id: "3", name: "Д. Петров", pos: "Защитник", statName: "Защита", value: 86, avatar: "👨🏽" },
-                { id: "4", name: "М. Соколов", pos: "Вратарь", statName: "Рефлексы", value: 89, avatar: "👦🦰" }
+        // Чистые базовые эмодзи без ZWJ-модификаторов
+        const avatars = ["👦", "👨", "🧔", "👱", "🧑", "👤"];
+
+        let state = JSON.parse(localStorage.getItem('my_football_v3_save')) || {
+            coins: 1350,
+            points: 7,
+            rating: 85,
+            energy: 17,
+            maxEnergy: 25,
+            gram: 1005.92,
+            squad: [
+                { id: "1", name: "М. Соколов", pos: "GK", rating: 89, line: "gk", price: 500, avatar: "👦" },
+                { id: "2", name: "Д. Петров", pos: "CB", rating: 86, line: "def", price: 450, avatar: "👨" },
+                { id: "3", name: "А. Сергеев", pos: "CB", rating: 84, line: "def", price: 420, avatar: "🧔" },
+                { id: "4", name: "В. Сидоров", pos: "LB", rating: 81, line: "def", price: 380, avatar: "👱" },
+                { id: "5", name: "Е. Морозов", pos: "RB", rating: 83, line: "def", price: 400, avatar: "🧑" },
+                { id: "6", name: "И. Иванов", pos: "CM", rating: 82, line: "mid", price: 400, avatar: "👦" },
+                { id: "7", name: "К. Козлов", pos: "CDM", rating: 85, line: "mid", price: 430, avatar: "👨" },
+                { id: "8", name: "О. Новиков", pos: "CAM", rating: 87, line: "mid", price: 480, avatar: "🧔" },
+                { id: "9", name: "А. Смирнов", pos: "ST", rating: 88, line: "att", price: 500, avatar: "👱" },
+                { id: "10", name: "Л. Орлов", pos: "LW", rating: 84, line: "att", price: 420, avatar: "🧑" },
+                { id: "11", name: "П. Волков", pos: "RW", rating: 85, line: "att", price: 440, avatar: "👤" }
+            ],
+            reserve: [
+                { id: "12", name: "С. Павлов", pos: "ST", rating: 78, line: "att", price: 300, avatar: "👦" }
             ],
             market: []
         };
 
-        const firstNames = ["А.", "И.", "Д.", "М.", "С.", "К.", "Е."];
-        const lastNames = ["Смирнов", "Иванов", "Петров", "Соколов", "Морозов", "Волков", "Васильев"];
-        const avatars = ["👦🏽", "🧑🏼‍🦱", "👨🏽", "👦🦰", "🧔‍♂️", "👱‍♂️"];
+        const positions = [
+            { pos: "ST", line: "att" }, { pos: "LW", line: "att" }, { pos: "RW", line: "att" },
+            { pos: "CM", line: "mid" }, { pos: "CAM", line: "mid" }, { pos: "CDM", line: "mid" },
+            { pos: "CB", line: "def" }, { pos: "LB", line: "def" }, { pos: "RB", line: "def" },
+            { pos: "GK", line: "gk" }
+        ];
+        const names = ["Н. Васин", "Р. Кузнецов", "М. Попов", "В. Соколов", "И. Михайлов", "А. Федоров"];
 
-        function getRarity(val) {
-            if (val >= 90) return "legendary";
-            if (val >= 80) return "epic";
-            if (val >= 70) return "rare";
-            return "common";
-        }
-
-        function generatePlayer() {
-            const positions = [
-                { pos: "Нападающий", stat: "Удар" },
-                { pos: "Полузащитник", stat: "Пас" },
-                { pos: "Защитник", stat: "Защита" },
-                { pos: "Вратарь", stat: "Рефлексы" }
-            ];
-            const pRole = positions[Math.floor(Math.random() * positions.length)];
-            const val = Math.floor(Math.random() * (94 - 65 + 1)) + 65;
-
+        function generateRandomPlayer() {
+            const p = positions[Math.floor(Math.random() * positions.length)];
+            const r = Math.floor(Math.random() * 20) + 75;
             return {
-                id: Math.random().toString(36).substr(2, 9),
-                name: firstNames[Math.floor(Math.random() * firstNames.length)] + " " + lastNames[Math.floor(Math.random() * lastNames.length)],
-                pos: pRole.pos,
-                statName: pRole.stat,
-                value: val,
-                price: val * 12,
+                id: "m_" + Math.random().toString(36).substr(2, 6),
+                name: names[Math.floor(Math.random() * names.length)],
+                pos: p.pos,
+                line: p.line,
+                rating: r,
+                price: r * 5,
                 avatar: avatars[Math.floor(Math.random() * avatars.length)]
             };
         }
 
-        // Заполнение рынка, если пуст
         if (!state.market || state.market.length === 0) {
-            state.market = [];
-            for (let i = 0; i < 4; i++) state.market.push(generatePlayer());
+            refreshMarket();
         }
 
         function save() {
-            localStorage.setItem('fc_manager_pro_data', JSON.stringify(state));
+            localStorage.setItem('my_football_v3_save', JSON.stringify(state));
             render();
         }
 
-        function buyPlayer(index) {
-            const p = state.market[index];
+        function refreshMarket() {
+            state.market = [generateRandomPlayer(), generateRandomPlayer(), generateRandomPlayer(), generateRandomPlayer()];
+            save();
+        }
+
+        function renderCard(p, mode, idx) {
+            let btnHTML = "";
+            if (mode === 'market') {
+                btnHTML = `<button class="btn-card btn-buy" onclick="buyPlayer(${idx})">Купить (${p.price} 🪙)</button>`;
+            } else if (mode === 'squad') {
+                btnHTML = `<button class="btn-card btn-sell" onclick="sellPlayer(${idx})">Продать (+${Math.floor(p.price * 0.7)} 🪙)</button>`;
+            }
+
+            return `
+                <div class="card">
+                    <div>
+                        <div class="card-header">
+                            <div class="card-avatar">${p.avatar}</div>
+                            <div>
+                                <span class="rating-pill">${p.rating}</span>
+                                <span class="pos-title">${p.pos}</span>
+                            </div>
+                        </div>
+                        <div class="card-name">${p.name}</div>
+                    </div>
+                    ${btnHTML}
+                </div>`;
+        }
+
+        function render() {
+            document.getElementById('val-coins').innerText = state.coins;
+            document.getElementById('disp-coins').innerText = state.coins;
+            document.getElementById('disp-points').innerText = state.points;
+            document.getElementById('disp-rating').innerText = state.rating;
+            document.getElementById('val-gram').innerText = Math.floor(state.gram);
+            document.getElementById('wallet-gram-val').innerText = state.gram.toFixed(2);
+            document.getElementById('wallet-coins-equiv').innerText = state.coins;
+            document.getElementById('val-energy').innerText = `${state.energy}/${state.maxEnergy}`;
+
+            // Отрисовка расстановки
+            const rAtt = document.getElementById('row-att');
+            const rMid = document.getElementById('row-mid');
+            const rDef = document.getElementById('row-def');
+            const rGk = document.getElementById('row-gk');
+            rAtt.innerHTML = ""; rMid.innerHTML = ""; rDef.innerHTML = ""; rGk.innerHTML = "";
+
+            state.squad.forEach(p => {
+                const dot = `
+                    <div class="player-dot">
+                        <div class="dot-avatar">${p.avatar}</div>
+                        <div class="dot-name">${p.name}</div>
+                        <div class="dot-pos">${p.pos}</div>
+                    </div>`;
+
+                if (p.line === 'att') rAtt.innerHTML += dot;
+                else if (p.line === 'mid') rMid.innerHTML += dot;
+                else if (p.line === 'def') rDef.innerHTML += dot;
+                else rGk.innerHTML += dot;
+            });
+
+            // Отрисовка списков
+            const sqEl = document.getElementById('squad-grid');
+            sqEl.innerHTML = "";
+            state.squad.forEach((p, i) => sqEl.innerHTML += renderCard(p, 'squad', i));
+
+            const resEl = document.getElementById('reserve-grid');
+            resEl.innerHTML = state.reserve.length === 0 ? `<div style="color:var(--text-muted); font-size:12px;">Нет запасных</div>` : "";
+            state.reserve.forEach((p, i) => resEl.innerHTML += renderCard(p, 'reserve', i));
+
+            const mkEl = document.getElementById('market-grid');
+            mkEl.innerHTML = "";
+            state.market.forEach((p, i) => mkEl.innerHTML += renderCard(p, 'market', i));
+        }
+
+        function buyPlayer(idx) {
+            const p = state.market[idx];
             if (state.coins >= p.price) {
                 state.coins -= p.price;
-                state.team.push(p);
-                state.market.splice(index, 1);
-                state.market.push(generatePlayer());
+                if (state.squad.length < 11) {
+                    state.squad.push(p);
+                } else {
+                    state.reserve.push(p);
+                }
+                state.market.splice(idx, 1);
+                state.market.push(generateRandomPlayer());
                 save();
             } else {
                 alert("Недостаточно монет!");
             }
         }
 
-        // РЕНДЕР ИНТЕРФЕЙСА
-        function render() {
-            document.getElementById('coins').innerText = state.coins;
-            document.getElementById('league-pts').innerText = state.points;
-
-            let avgRating = 0;
-            if (state.team.length > 0) {
-                const total = state.team.reduce((sum, p) => sum + p.value, 0);
-                avgRating = Math.round(total / state.team.length);
+        function sellPlayer(idx) {
+            if (state.squad.length <= 1) {
+                alert("Нельзя продать последнего игрока!");
+                return;
             }
-            document.getElementById('team-rating').innerText = avgRating;
-
-            // 1. Отрисовка расстановки на Поле
-            const rowAtt = document.getElementById('row-att');
-            const rowMid = document.getElementById('row-mid');
-            const rowDef = document.getElementById('row-def');
-            const rowGk = document.getElementById('row-gk');
-
-            rowAtt.innerHTML = ""; rowMid.innerHTML = ""; rowDef.innerHTML = ""; rowGk.innerHTML = "";
-
-            state.team.forEach(p => {
-                const playerHTML = `
-                    <div class="field-player" id="fp-${p.id}">
-                        <div class="field-avatar">${p.avatar}</div>
-                        <div class="field-name">${p.name}</div>
-                        <div class="field-role">${p.pos}</div>
-                    </div>`;
-
-                if (p.pos === "Нападающий") rowAtt.innerHTML += playerHTML;
-                else if (p.pos === "Полузащитник") rowMid.innerHTML += playerHTML;
-                else if (p.pos === "Защитник") rowDef.innerHTML += playerHTML;
-                else rowGk.innerHTML += playerHTML;
-            });
-
-            // 2. Отрисовка Команды (Карточки)
-            const squad = document.getElementById('squad');
-            squad.innerHTML = "";
-            state.team.forEach(p => {
-                const rarity = getRarity(p.value);
-                squad.innerHTML += `
-                    <div class="card rarity-${rarity}">
-                        <div class="card-header">
-                            <div class="avatar-ring">${p.avatar}</div>
-                            <div class="rating-badge">${p.value}</div>
-                        </div>
-                        <div class="pos-tag">${p.pos}</div>
-                        <div class="player-name">${p.name}</div>
-                        <div class="stat-info">
-                            <span>${p.statName}</span>
-                            <span>${p.value}/100</span>
-                        </div>
-                        <div class="progress-bg">
-                            <div class="progress-fill" style="width: ${p.value}%"></div>
-                        </div>
-                    </div>`;
-            });
-
-            // 3. Отрисовка Рынка (Карточки)
-            const market = document.getElementById('market');
-            market.innerHTML = "";
-            state.market.forEach((p, i) => {
-                const rarity = getRarity(p.value);
-                market.innerHTML += `
-                    <div class="card rarity-${rarity}">
-                        <div class="card-header">
-                            <div class="avatar-ring">${p.avatar}</div>
-                            <div class="rating-badge">${p.value}</div>
-                        </div>
-                        <div class="pos-tag">${p.pos}</div>
-                        <div class="player-name">${p.name}</div>
-                        <div class="stat-info">
-                            <span>${p.statName}</span>
-                            <span>${p.value}/100</span>
-                        </div>
-                        <div class="progress-bg">
-                            <div class="progress-fill" style="width: ${p.value}%"></div>
-                        </div>
-                        <button class="btn-small" onclick="buyPlayer(${i})">Купить (${p.price} 💰)</button>
-                    </div>`;
-            });
-        }
-
-        // АНИМИРОВАННЫЙ МАТЧ
-        async function playAnimatedMatch() {
-            const btn = document.getElementById('play-btn');
-            const log = document.getElementById('match-log');
-            const ball = document.getElementById('soccer-ball');
-            const pitch = document.getElementById('pitch-container');
-            const goalBanner = document.getElementById('goal-banner');
-
-            btn.disabled = true;
-            log.innerText = "Матч начался! Команды выходят на поле...";
-
-            // Находим игроков
-            const mid = state.team.find(p => p.pos === "Полузащитник") || state.team[0];
-            const att = state.team.find(p => p.pos === "Нападающий") || state.team[0];
-
-            const elMid = document.getElementById(`fp-${mid.id}`);
-            const elAtt = document.getElementById(`fp-${att.id}`);
-
-            const pitchRect = pitch.getBoundingClientRect();
-
-            // Функция перемещения мяча к элементу
-            function moveBallTo(element) {
-                if (!element) return;
-                const rect = element.getBoundingClientRect();
-                const x = rect.left - pitchRect.left + rect.width / 2 - 10;
-                const y = rect.top - pitchRect.top + rect.height / 2 - 10;
-                ball.style.opacity = "1";
-                ball.style.left = `${x}px`;
-                ball.style.top = `${y}px`;
-            }
-
-            // ШАГ 1: Пас полузащитнику
-            await new Promise(r => setTimeout(r, 600));
-            log.innerText = `${mid.name} получает мяч в центре поля...`;
-            if (elMid) {
-                elMid.classList.add('has-ball');
-                moveBallTo(elMid);
-            }
-
-            // ШАГ 2: Передача нападающему
-            await new Promise(r => setTimeout(r, 1200));
-            log.innerText = `${mid.name} отдаёт отличный пас на ${att.name}!`;
-            if (elMid) elMid.classList.remove('has-ball');
-            if (elAtt) {
-                elAtt.classList.add('has-ball');
-                moveBallTo(elAtt);
-            }
-
-            // ШАГ 3: Удар по воротам
-            await new Promise(r => setTimeout(r, 1200));
-            log.innerText = `${att.name} выходит один на один и бьёт по воротам!`;
-            
-            // Перемещаем мяч в верхнюю часть поля (в ворота)
-            ball.style.left = `${pitchRect.width / 2 - 10}px`;
-            ball.style.top = `15px`;
-
-            await new Promise(r => setTimeout(r, 700));
-
-            // Итог
-            const isGoal = Math.random() > 0.35; // 65% шанс гола
-            if (isGoal) {
-                goalBanner.classList.add('show');
-                state.points += 3;
-                state.coins += 150;
-                log.innerText = "🎉 ГОЛ! Победа! Получено +3 очка и 150 монет.";
-            } else {
-                log.innerText = "❌ Вратарь соперника совершил сэйв. Ничья (+1 очко).";
-                state.points += 1;
-                state.coins += 50;
-            }
-
-            await new Promise(r => setTimeout(r, 1500));
-            goalBanner.classList.remove('show');
-            if (elAtt) elAtt.classList.remove('has-ball');
-            ball.style.opacity = "0";
-
-            btn.disabled = false;
+            const p = state.squad[idx];
+            state.coins += Math.floor(p.price * 0.7);
+            state.squad.splice(idx, 1);
             save();
         }
 
-        // Навигация по вкладкам
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            el.classList.add('active');
-        }
-
-        render();
-    </script>
-</body>
-</html>
+        function sendP2PTransfer() {
+            const targe
