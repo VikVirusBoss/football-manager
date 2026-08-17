@@ -360,9 +360,8 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <script>
+    </div>           
+        <script>
         // --- ДАННЫЕ И ГЕНЕРАТОР НАЦИОНАЛЬНОСТЕЙ ---
         const NATIONALITIES = [
             { country: 'Россия', flag: '🇷🇺', names: ['Иванов', 'Смирнов', 'Кузнецов', 'Попов', 'Соколов', 'Лебедев', 'Козлов', 'Новиков'] },
@@ -397,14 +396,6 @@
             leagueTable: []
         };
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
-        window.onload = function() {
-            initStarterSquad();
-            initLeagueTable();
-            refreshMarket();
-            updateUI();
-        };
-
         function generatePlayer(minRating = 55, maxRating = 69) {
             const nat = NATIONALITIES[Math.floor(Math.random() * NATIONALITIES.length)];
             const name = nat.names[Math.floor(Math.random() * nat.names.length)];
@@ -433,11 +424,11 @@
         }
 
         function initStarterSquad() {
-            // Создаем 11 игроков старта
+            gameState.mainSquad = [];
+            gameState.bench = [];
             for(let i=0; i<11; i++) {
                 gameState.mainSquad.push(generatePlayer(58, 65));
             }
-            // 3 запасных
             for(let i=0; i<3; i++) {
                 gameState.bench.push(generatePlayer(55, 62));
             }
@@ -453,7 +444,12 @@
             });
         }
 
-        // --- ИНТЕРФЕЙС И РЕНДЕР ---
+        function getTeamPower() {
+            if (!gameState.mainSquad || gameState.mainSquad.length === 0) return 0;
+            const sum = gameState.mainSquad.reduce((acc, p) => acc + getPlayerRating(p), 0);
+            return Math.round(sum / gameState.mainSquad.length);
+        }
+
         function updateUI() {
             document.getElementById('coins').innerText = gameState.coins;
             document.getElementById('gram').innerText = gameState.gram;
@@ -468,21 +464,13 @@
             renderMarket();
         }
 
-        function getTeamPower() {
-            if (gameState.mainSquad.length === 0) return 0;
-            const sum = gameState.mainSquad.reduce((acc, p) => acc + getPlayerRating(p), 0);
-            return Math.round(sum / gameState.mainSquad.length);
-        }
-
         function renderPitch() {
             const pitch = document.getElementById('pitch');
-            // Удаляем старые карточки с поля
             const cards = pitch.querySelectorAll('.player-position');
             cards.forEach(c => c.remove());
 
             document.getElementById('team-power').innerText = getTeamPower();
 
-            // Координаты для схем
             const layout = getFormationCoordinates(gameState.formation);
             gameState.mainSquad.forEach((player, index) => {
                 if (index < 11) {
@@ -498,24 +486,35 @@
         }
 
         function getFormationCoordinates(fmt) {
-            // Базовые координаты 11 игроков [%top, %left]
-            if (fmt === '4-3-3') {
-                return [
-                    {top: 88, left: 50}, // GK
-                    {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85}, // DEF
-                    {top: 45, left: 25}, {top: 48, left: 50}, {top: 45, left: 75}, // MID
-                    {top: 20, left: 20}, {top: 15, left: 50}, {top: 20, left: 80}  // ATT
-                ];
-            } else if (fmt === '4-4-2') {
+            if (fmt === '4-4-2') {
                 return [
                     {top: 88, left: 50},
                     {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85},
                     {top: 45, left: 15}, {top: 45, left: 38}, {top: 45, left: 62}, {top: 45, left: 85},
                     {top: 18, left: 35}, {top: 18, left: 65}
                 ];
+            } else if (fmt === '3-5-2') {
+                return [
+                    {top: 88, left: 50},
+                    {top: 72, left: 25}, {top: 74, left: 50}, {top: 72, left: 75},
+                    {top: 48, left: 15}, {top: 45, left: 32}, {top: 48, left: 50}, {top: 45, left: 68}, {top: 48, left: 85},
+                    {top: 18, left: 35}, {top: 18, left: 65}
+                ];
+            } else if (fmt === '5-3-2') {
+                return [
+                    {top: 88, left: 50},
+                    {top: 70, left: 12}, {top: 72, left: 31}, {top: 74, left: 50}, {top: 72, left: 69}, {top: 70, left: 88},
+                    {top: 45, left: 25}, {top: 48, left: 50}, {top: 45, left: 75},
+                    {top: 18, left: 35}, {top: 18, left: 65}
+                ];
             }
-            // По умолчанию
-            return getFormationCoordinates('4-3-3');
+            // По умолчанию 4-3-3
+            return [
+                {top: 88, left: 50},
+                {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85},
+                {top: 45, left: 25}, {top: 48, left: 50}, {top: 45, left: 75},
+                {top: 20, left: 20}, {top: 15, left: 50}, {top: 20, left: 80}
+            ];
         }
 
         function renderCardHTML(player, actionBtn = '') {
@@ -536,6 +535,8 @@
             const benchContainer = document.getElementById('bench-list');
             const reserveContainer = document.getElementById('reserve-list');
 
+            if (!mainContainer || !benchContainer || !reserveContainer) return;
+
             mainContainer.innerHTML = '';
             benchContainer.innerHTML = '';
             reserveContainer.innerHTML = '';
@@ -549,13 +550,10 @@
             });
 
             gameState.reserve.forEach((p, idx) => {
-                reserveContainer.innerHTML
-                            gameState.reserve.forEach((p, idx) => {
                 reserveContainer.innerHTML += renderCardHTML(p, `<button onclick="moveToBenchFromReserve(${idx})" style="font-size:9px; margin-top:3px;">В Запас</button> <button onclick="sellPlayer('${p.id}')" style="font-size:9px;">Продать</button>`);
             });
         }
 
-        // --- МЕХАНИКА РОТАЦИИ СОСТАВА ---
         function moveToBench(index) {
             const p = gameState.mainSquad.splice(index, 1)[0];
             gameState.bench.push(p);
@@ -605,7 +603,6 @@
             renderPitch();
         }
 
-        // --- СИМУЛЯЦИЯ МАТЧА И ТЕКСТОВАЯ ТРАНСЛЯЦИЯ ---
         function playMatch() {
             if (gameState.energy < 1) {
                 alert('Недостаточно энергии ⚡!');
@@ -626,7 +623,6 @@
             let userGoals = 0;
             let oppGoals = 0;
 
-            // Генерация событий по минутам
             let minutes = [12, 28, 41, 55, 73, 86];
             minutes.forEach(min => {
                 const chance = Math.random() * (userPower + opponentPower);
@@ -648,7 +644,6 @@
                 }
             });
 
-            // Итоги
             let userTeamInTable = gameState.leagueTable.find(t => t.isUser);
             if (userGoals > oppGoals) {
                 log.innerHTML += `<br><b>Финальный свисток! ПОБЕДА ${userGoals}:${oppGoals}! +3 очка, +30 🪙</b>`;
@@ -685,12 +680,12 @@
                     else { team.l += 1; }
                 }
             });
-            // Сортировка таблицы по очкам
             gameState.leagueTable.sort((a, b) => b.pts - a.pts);
         }
 
         function renderLeagueTable() {
             const body = document.getElementById('league-table-body');
+            if (!body) return;
             body.innerHTML = '';
             gameState.leagueTable.forEach((team, idx) => {
                 let rowClass = '';
@@ -728,7 +723,6 @@
             initLeagueTable();
         }
 
-        // --- МАГАЗИН И РЫНОК ---
         function buyPack(type, price) {
             if (gameState.coins < price) {
                 alert('Недостаточно монет!');
@@ -756,6 +750,7 @@
 
         function renderMarket() {
             const marketContainer = document.getElementById('market-list');
+            if (!marketContainer) return;
             marketContainer.innerHTML = '';
             gameState.market.forEach((p, idx) => {
                 const price = getPlayerRating(p) * 15;
@@ -784,14 +779,22 @@
             updateUI();
         }
 
-        // --- НАВИГАЦИЯ ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            const targetTab = document.getElementById(tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            if (window.event && window.event.target) {
+                window.event.target.classList.add('active');
+            }
         }
-    </script>
-</body>
-</html>
+
+        // --- ПРЯМОЙ ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ ---
+        initStarterSquad();
+        initLeagueTable();
+        refreshMarket();
+        updateUI();
+            </script>
+            
