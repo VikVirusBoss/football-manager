@@ -3,384 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Футбольный Менеджер</title>
+    <title>My Football League</title>
     <style>
-        :root {
-            --bg-color: #121212;
-            --panel-bg: #1e1e1e;
-            --accent: #2ed573;
-            --accent-hover: #26af5f;
-            --text-color: #ffffff;
-            --text-dim: #aaa;
-            --bronze: #cd7f32;
-            --silver: #c0c0c0;
-            --gold: #ffd700;
-            --legend: #a55eea;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            user-select: none;
-        }
-
-        .header {
-            background-color: var(--panel-bg);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #333;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .stats {
-            display: flex;
-            gap: 15px;
-            font-weight: bold;
-        }
-
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background: #2a2a2a;
-            padding: 5px 10px;
-            border-radius: 8px;
-        }
-
-        .nav-tabs {
-            display: flex;
-            background: #181818;
-            border-bottom: 1px solid #333;
-        }
-
-        .nav-btn {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            border-bottom: 3px solid transparent;
-        }
-
-        .nav-btn.active {
-            color: var(--accent);
-            border-bottom-color: var(--accent);
-            background: #222;
-        }
-
-        .container {
-            padding: 15px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Поле / Стадион */
-        .pitch {
-            background: linear-gradient(to bottom, #11998e, #38ef7d);
-            border: 3px solid #fff;
-            border-radius: 10px;
-            height: 380px;
-            position: relative;
-            margin-bottom: 15px;
-            overflow: hidden;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-        }
-
-        .pitch-lines {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: rgba(255,255,255,0.5);
-        }
-
-        .center-circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 50%;
-        }
-
-        .player-position {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        /* Карточки игроков */
-        .card {
-            background: #2a2a2a;
-            border-radius: 8px;
-            padding: 6px;
-            width: 70px;
-            text-align: center;
-            border: 2px solid #555;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            font-size: 11px;
-            cursor: pointer;
-            display: inline-block;
-        }
-
-        .card.tier-bronze { border-color: var(--bronze); }
-        .card.tier-silver { border-color: var(--silver); }
-        .card.tier-gold { border-color: var(--gold); }
-        .card.tier-legend { border-color: var(--legend); box-shadow: 0 0 10px var(--legend); }
-
-        .card-rating {
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .card-stars {
-            color: var(--gold);
-            font-size: 10px;
-        }
-
-        /* Состав и Списки */
-        .squad-section {
-            background: var(--panel-bg);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        .squad-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        /* Трансляция матча */
-        .match-log {
-            background: #000;
-            border-radius: 8px;
-            padding: 10px;
-            height: 150px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 13px;
-            color: #2ed573;
-            border: 1px solid #333;
-        }
-
-        /* Таблица Лиги */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--panel-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            font-size: 14px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-        }
-
-        th { background: #252525; }
-        .promo { background: rgba(46, 213, 115, 0.15); }
-        .relegation { background: rgba(255, 71, 87, 0.15); }
-
-        /* Кнопки */
-        .btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn:hover { background: var(--accent-hover); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .controls-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        select {
-            background: #2a2a2a;
-            color: #fff;
-            border: 1px solid #444;
-            padding: 8px;
-            border-radius: 6px;
-        }
-
-        /* Паки в магазине */
-        .packs-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-
-        .pack-card {
-            background: var(--panel-bg);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #333;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: #121212; color: #fff; padding: 10px; font-size: 14px; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        .stat-box { display: flex; gap: 10px; align-items: center; }
+        .stat { background: #2a2a2a; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+        .nav { display: flex; gap: 5px; background: #1e1e1e; padding: 5px; border-radius: 8px; margin-bottom: 10px; overflow-x: auto; }
+        .nav-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
+        .nav-btn.active { color: #4CAF50; border-bottom-color: #4CAF50; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .controls-bar { display: flex; gap: 10px; align-items: center; background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        select, .btn { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+        .btn-green { background: #2E7D32; font-weight: bold; border: none; color: #fff; }
+        
+        .pitch { position: relative; width: 100%; height: 350px; background: linear-gradient(to bottom, #1b5e20, #2e7d32); border: 2px solid #fff; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+        .pitch-line { position: absolute; top: 50%; width: 100%; height: 2px; background: rgba(255,255,255,0.5); }
+        .pitch-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; }
+        
+        .player-position { position: absolute; transform: translate(-50%, -50%); }
+        .card { background: #2a2a2a; border: 1px solid #444; border-radius: 6px; padding: 4px; text-align: center; font-size: 10px; min-width: 65px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .tier-bronze { border-color: #cd7f32; background: #2a2018; }
+        .tier-silver { border-color: #c0c0c0; background: #22252a; }
+        .tier-gold { border-color: #ffd700; background: #332d15; }
+        .card-rating { font-weight: bold; color: #4CAF50; font-size: 11px; }
+        .card-stars { color: #ffd700; font-size: 8px; }
+        
+        .log-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; height: 120px; overflow-y: auto; font-family: monospace; font-size: 11px; color: #00ff00; }
+        .squad-section { margin-bottom: 15px; }
+        .squad-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 8px; text-align: center; border-bottom: 1px solid #333; font-size: 12px; }
+        th { background: #2a2a2a; }
+        .promo { background: rgba(76, 175, 80, 0.2); }
+        .relegation { background: rgba(244, 67, 54, 0.2); }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="stats">
-            <div class="stat-item">⚡ <span id="energy">25</span>/25</div>
-            <div class="stat-item">🪙 <span id="coins">1000</span></div>
-            <div class="stat-item">💎 <span id="gram">0</span></div>
+        <div class="stat-box">
+            <span class="stat">⚡ <span id="energy">25</span>/25</span>
+            <span class="stat">🪙 <span id="coins">1000</span></span>
+            <span class="stat">💎 <span id="gram">0</span></span>
         </div>
-        <div>
-            <b>Ур. Тренера: <span id="level">1</span></b>
+        <div>Ур. Тренера: <b id="level">1</b></div>
+    </div>
+
+    <div class="nav">
+        <button class="nav-btn active" onclick="switchTab('match-tab')">🏟️ Матч</button>
+        <button class="nav-btn" onclick="switchTab('squad-tab')">📋 Команда</button>
+        <button class="nav-btn" onclick="switchTab('league-tab')">🏆 Лига</button>
+        <button class="nav-btn" onclick="switchTab('market-tab')">🛒 Рынок</button>
+        <button class="nav-btn" onclick="switchTab('store-tab')">🎁 Магазин</button>
+    </div>
+
+    <div id="match-tab" class="tab-content active">
+        <div class="controls-bar">
+            <label>Схема:</label>
+            <select id="formation-select" onchange="changeFormation(this.value)">
+                <option value="4-3-3">4-3-3</option>
+                <option value="4-4-2">4-4-2</option>
+                <option value="3-5-2">3-5-2</option>
+                <option value="5-3-2">5-3-2</option>
+            </select>
+            <div>Сила: <b id="team-power">0</b></div>
+            <button class="btn btn-green" style="margin-left:auto;" onclick="playMatch()">Сыграть матч (1⚡)</button>
+        </div>
+
+        <div class="pitch" id="pitch">
+            <div class="pitch-line"></div>
+            <div class="pitch-circle"></div>
+        </div>
+
+        <div style="margin-bottom:5px; font-weight:bold;">🎙️ Текстовая трансляция матча</div>
+        <div class="log-box" id="match-log">Ожидание начала матча...</div>
+    </div>
+
+    <div id="squad-tab" class="tab-content">
+        <div class="squad-section">
+            <h3>Основной состав (11)</h3>
+            <div class="squad-grid" id="main-squad-list"></div>
+        </div>
+        <div class="squad-section">
+            <h3>Запасные (до 5)</h3>
+            <div class="squad-grid" id="bench-list"></div>
+        </div>
+        <div class="squad-section">
+            <h3>Резерв</h3>
+            <div class="squad-grid" id="reserve-list"></div>
         </div>
     </div>
 
-    <div class="nav-tabs">
-        <button class="nav-btn active" onclick="switchTab('stadium')">🏟️ Матч</button>
-        <button class="nav-btn" onclick="switchTab('squad')">📋 Команда</button>
-        <button class="nav-btn" onclick="switchTab('league')">🏆 Лига</button>
-        <button class="nav-btn" onclick="switchTab('market')">🛒 Рынок</button>
-        <button class="nav-btn" onclick="switchTab('shop')">🎁 Магазин</button>
+    <div id="league-tab" class="tab-content">
+        <h3>Дивизион <span id="league-div">3</span> | Тур <span id="current-tour">1</span>/38</h3>
+        <br>
+        <table>
+            <thead>
+                <tr><th>#</th><th>Клуб</th><th>В</th><th>Н</th><th>П</th><th>Очки</th></tr>
+            </thead>
+            <tbody id="league-table-body"></tbody>
+        </table>
     </div>
 
-    <div class="container">
-        <!-- 🏟️ СТАДИОН И МАТЧ -->
-        <div id="stadium" class="tab-content active">
-            <div class="controls-bar">
-                <label>Схема:</label>
-                <select id="formation-select" onchange="changeFormation(this.value)">
-                    <option value="4-3-3">4-3-3</option>
-                    <option value="4-4-2">4-4-2</option>
-                    <option value="3-5-2">3-5-2</option>
-                    <option value="5-3-2">5-3-2</option>
-                </select>
-                <span>Сила команды: <b id="team-power">0</b></span>
-                <button class="btn" style="margin-left: auto;" onclick="playMatch()" id="play-btn">Сыграть матч (1⚡)</button>
-            </div>
+    <div id="market-tab" class="tab-content">
+        <h3>Трансферный рынок</h3>
+        <div class="squad-grid" id="market-list" style="margin-top:10px;"></div>
+    </div>
 
-            <div class="pitch" id="pitch">
-                <div class="pitch-lines"></div>
-                <div class="center-circle"></div>
-                <!-- Игроки на поле генерируются через JS -->
-            </div>
-
-            <h3>🎙️ Текстовая трансляция матча</h3>
-            <div class="match-log" id="match-log">Ожидание начала матча...</div>
+    <div id="store-tab" class="tab-content">
+        <h3>Магазин паков</h3>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="btn" onclick="buyPack('bronze', 200)">Бронзовый пак (200🪙)</button>
+            <button class="btn" onclick="buyPack('silver', 500)">Серебряный пак (500🪙)</button>
+            <button class="btn" onclick="buyPack('gold', 1200)">Золотой пак (1200🪙)</button>
         </div>
+    </div>
 
-        <!-- 📋 УПРАВЛЕНИЕ СОСТАВОМ -->
-        <div id="squad" class="tab-content">
-            <div class="squad-section">
-                <h3>Основной состав (11)</h3>
-                <div class="squad-grid" id="main-squad-list"></div>
-            </div>
-            <div class="squad-section">
-                <h3>Запасные (Скамейка)</h3>
-                <div class="squad-grid" id="bench-list"></div>
-            </div>
-            <div class="squad-section">
-                <h3>Резерв клуба</h3>
-                <div class="squad-grid" id="reserve-list"></div>
-            </div>
-        </div>
-
-        <!-- 🏆 ТАБЛИЦА ЛИГИ -->
-        <div id="league" class="tab-content">
-            <h3>Чемпионат — Дивизион <span id="league-div">3</span> (Тур <span id="current-tour">1</span>/38)</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Клуб</th>
-                        <th>В</th>
-                        <th>Н</th>
-                        <th>П</th>
-                        <th>Очки</th>
-                    </tr>
-                </thead>
-                <tbody id="league-table-body"></tbody>
-            </table>
-        </div>
-
-        <!-- 🛒 ТРАНСФЕРНЫЙ РЫНОК -->
-        <div id="market" class="tab-content">
-            <h3>Трансферный рынок</h3>
-            <p>Покупайте новых игроков или продавайте своих из Резерва.</p>
-            <div class="squad-grid" id="market-list"></div>
-        </div>
-
-        <!-- 🎁 МАГАЗИН БОКСОВ -->
-        <div id="shop" class="tab-content">
-            <h3>Магазин Паков</h3>
-            <div class="packs-grid">
-                <div class="pack-card">
-                    <h4>🟤 Бронзовый Пак</h4>
-                    <p>Шанс на Бронзу или Серебро</p>
-                    <button class="btn" onclick="buyPack('bronze', 250)">Купить (250 🪙)</button>
-                </div>
-                <div class="pack-card">
-                    <h4>⚪ Серебряный Пак</h4>
-                    <p>Гарантированное Серебро + шанс Золота</p>
-                    <button class="btn" onclick="buyPack('silver', 600)">Купить (600 🪙)</button>
-                </div>
-                <div class="pack-card">
-                    <h4>🟡 Золотой Пак</h4>
-                    <p>Высокий шанс Золота и Легенды</p>
-                    <button class="btn" onclick="buyPack('gold', 1500)">Купить (1500 🪙)</button>
-                </div>
-            </div>
-        </div>
-    </div>           
-        <script>
-        // --- ДАННЫЕ И ГЕНЕРАТОР НАЦИОНАЛЬНОСТЕЙ ---
+    <script>
         const NATIONALITIES = [
-            { country: 'Россия', flag: '🇷🇺', names: ['Иванов', 'Смирнов', 'Кузнецов', 'Попов', 'Соколов', 'Лебедев', 'Козлов', 'Новиков'] },
-            { country: 'Германия', flag: '🇩🇪', names: ['Шмидт', 'Мюллер', 'Шнайдер', 'Вебер', 'Фишер', 'Крюгер', 'Гофман', 'Беккер'] },
-            { country: 'Португалия', flag: '🇵🇹', names: ['Силва', 'Фернандеш', 'Кошта', 'Перейра', 'Невеш', 'Алмейда', 'Мартинш', 'Соуза'] },
-            { country: 'Испания', flag: '🇪🇸', names: ['Гарсия', 'Торрес', 'Лопес', 'Родригес', 'Мартинес', 'Санчес', 'Гомес', 'Морено'] },
-            { country: 'Франция', flag: '🇫🇷', names: ['Дюпон', 'Моро', 'Лоран', 'Бернар', 'Жиро', 'Леруа', 'Руссо', 'Боне'] },
-            { country: 'Англия', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', names: ['Смит', 'Джонсон', 'Браун', 'Тейлор', 'Уилсон', 'Эванс', 'Томас', 'Уокер'] },
-            { country: 'Италия', flag: '🇮🇹', names: ['Росси', 'Феррари', 'Эспозито', 'Романо', 'Риччи', 'Марино', 'Греко', 'Бруни'] },
-            { country: 'Нигерия', flag: '🇳🇬', names: ['Окоча', 'Калу', 'Оби', 'Муса', 'Авонийи', 'Эзике', 'Ивоби', 'Балогун'] },
-            { country: 'Сенегал', flag: '🇸🇳', names: ['Диоп', 'Менди', 'Диалло', 'Сарр', 'Фофана', 'Камара', 'Гуйе', 'Баде'] },
-            { country: 'Япония', flag: '🇯🇵', names: ['Танака', 'Ямамото', 'Сато', 'Такахаси', 'Ватанабэ', 'Ито', 'Накамура', 'Кобаяси'] },
-            { country: 'Бразилия', flag: '🇧🇷', names: ['Силва', 'Сантос', 'Оливейра', 'Соуза', 'Родригес', 'Ферейра', 'Алвес', 'Лима'] },
-            { country: 'Аргентина', flag: '🇦🇷', names: ['Гомес', 'Диас', 'Альварес', 'Ромеро', 'Соса', 'Торрес', 'Бенитес', 'Акоста'] }
+            { country: 'Россия', flag: '🇷🇺', names: ['Иванов', 'Смирнов', 'Кузнецов', 'Попов', 'Соколов'] },
+            { country: 'Германия', flag: '🇩🇪', names: ['Шмидт', 'Мюллер', 'Шнайдер', 'Вебер', 'Фишер'] },
+            { country: 'Португалия', flag: '🇵🇹', names: ['Силва', 'Фернандеш', 'Кошта', 'Перейра', 'Невеш'] },
+            { country: 'Испания', flag: '🇪🇸', names: ['Гарсия', 'Торрес', 'Лопес', 'Родригес', 'Мартинес'] },
+            { country: 'Франция', flag: '🇫🇷', names: ['Дюпон', 'Моро', 'Лоран', 'Бернар', 'Жиро'] },
+            { country: 'Англия', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', names: ['Смит', 'Джонсон', 'Браун', 'Тейлор', 'Уилсон'] },
+            { country: 'Бразилия', flag: '🇧🇷', names: ['Силва', 'Сантос', 'Оливейра', 'Соуза', 'Лима'] },
+            { country: 'Аргентина', flag: '🇦🇷', names: ['Гомес', 'Диас', 'Альварес', 'Ромеро', 'Торрес'] }
         ];
 
         const POSITIONS = ['GK', 'CB', 'LB', 'RB', 'CM', 'LM', 'RM', 'CAM', 'ST'];
 
-        // --- СОСТОЯНИЕ ИГРЫ ---
         let gameState = {
             coins: 1000,
             gram: 0,
@@ -403,8 +160,7 @@
             const baseRating = Math.floor(Math.random() * (maxRating - minRating + 1)) + minRating;
             
             let tier = 'bronze';
-            if (baseRating >= 90) tier = 'legend';
-            else if (baseRating >= 80) tier = 'gold';
+            if (baseRating >= 80) tier = 'gold';
             else if (baseRating >= 70) tier = 'silver';
 
             return {
@@ -435,7 +191,7 @@
         }
 
         function initLeagueTable() {
-            const botTeams = ['ФК Заря', 'ФК Мюнхен', 'ФК Мадрид', 'ФК Неаполь', 'ФК Лион', 'ФК Порту', 'ФК Аякс', 'ФК Милан', 'ФК Лондон', 'ФК Севилья', 'ФК Рим', 'ФК Прага', 'ФК Берлин', 'ФК Монако', 'ФК Лиссабон', 'ФК Токио', 'ФК Сантос', 'ФК Вена', 'ФК Париж'];
+            const botTeams = ['ФК Заря', 'ФК Мюнхен', 'ФК Мадрид', 'ФК Неаполь', 'ФК Лион', 'ФК Порту', 'ФК Аякс', 'ФК Милан', 'ФК Лондон', 'ФК Севилья'];
             gameState.leagueTable = [
                 { name: 'Вы (Ваш Клуб)', w: 0, d: 0, l: 0, pts: 0, isUser: true }
             ];
@@ -466,6 +222,7 @@
 
         function renderPitch() {
             const pitch = document.getElementById('pitch');
+            if (!pitch) return;
             const cards = pitch.querySelectorAll('.player-position');
             cards.forEach(c => c.remove());
 
@@ -508,7 +265,6 @@
                     {top: 18, left: 35}, {top: 18, left: 65}
                 ];
             }
-            // По умолчанию 4-3-3
             return [
                 {top: 88, left: 50},
                 {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85},
@@ -690,7 +446,7 @@
             gameState.leagueTable.forEach((team, idx) => {
                 let rowClass = '';
                 if (idx < 2) rowClass = 'promo';
-                if (idx >= 18) rowClass = 'relegation';
+                if (idx >= 8) rowClass = 'relegation';
 
                 body.innerHTML += `
                     <tr class="${rowClass}">
@@ -713,7 +469,7 @@
                 msg += 'Поздравляем! Вы поднимаетесь в высший дивизион и получаете +50 💎!';
                 gameState.division = Math.max(1, gameState.division - 1);
                 gameState.gram += 50;
-            } else if (userIndex >= 18) {
+            } else if (userIndex >= 8) {
                 msg += 'К сожалению, ваша команда вылетает в дивизион ниже.';
                 gameState.division += 1;
             }
@@ -791,10 +547,10 @@
             }
         }
 
-        // --- ПРЯМОЙ ЗАПУСК ИГРЫ ПРИ ЗАГРУЗКЕ ---
         initStarterSquad();
         initLeagueTable();
         refreshMarket();
         updateUI();
-            </script>
-            
+    </script>
+</body>
+</html>
