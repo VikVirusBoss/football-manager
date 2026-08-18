@@ -3,45 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Football League</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: #121212; color: #fff; padding: 10px; font-size: 14px; }
-        .header { display: flex; justify-content: space-between; align-items: center; background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        .stat-box { display: flex; gap: 10px; align-items: center; }
-        .stat { background: #2a2a2a; padding: 5px 10px; border-radius: 5px; font-weight: bold; }
-        .nav { display: flex; gap: 5px; background: #1e1e1e; padding: 5px; border-radius: 8px; margin-bottom: 10px; overflow-x: auto; }
-        .nav-btn { flex: 1; padding: 8px; background: transparent; border: none; color: #888; font-weight: bold; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; }
-        .nav-btn.active { color: #4CAF50; border-bottom-color: #4CAF50; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .controls-bar { display: flex; gap: 10px; align-items: center; background: #1e1e1e; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        select, .btn { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
-        .btn-green { background: #2E7D32; font-weight: bold; border: none; color: #fff; }
-        
-        .pitch { position: relative; width: 100%; height: 350px; background: linear-gradient(to bottom, #1b5e20, #2e7d32); border: 2px solid #fff; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-        .pitch-line { position: absolute; top: 50%; width: 100%; height: 2px; background: rgba(255,255,255,0.5); }
-        .pitch-circle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border: 2px solid rgba(255,255,255,0.5); border-radius: 50%; }
-        
-        .player-position { position: absolute; transform: translate(-50%, -50%); }
-        .card { background: #2a2a2a; border: 1px solid #444; border-radius: 6px; padding: 4px; text-align: center; font-size: 10px; min-width: 65px; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .tier-bronze { border-color: #cd7f32; background: #2a2018; }
-        .tier-silver { border-color: #c0c0c0; background: #22252a; }
-        .tier-gold { border-color: #ffd700; background: #332d15; }
-        .card-rating { font-weight: bold; color: #4CAF50; font-size: 11px; }
-        .card-stars { color: #ffd700; font-size: 8px; }
-        
-        .log-box { background: #000; border: 1px solid #333; border-radius: 8px; padding: 10px; height: 120px; overflow-y: auto; font-family: monospace; font-size: 11px; color: #00ff00; }
-        .squad-section { margin-bottom: 15px; }
-        .squad-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
-        
-        table { width: 100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 8px; text-align: center; border-bottom: 1px solid #333; font-size: 12px; }
-        th { background: #2a2a2a; }
-        .promo { background: rgba(76, 175, 80, 0.2); }
-        .relegation { background: rgba(244, 67, 54, 0.2); }
-    </style>
+    <title>My Football League Pro</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -51,20 +14,20 @@
             <span class="stat">🪙 <span id="coins">1000</span></span>
             <span class="stat">💎 <span id="gram">0</span></span>
         </div>
-        <div>Ур. Тренера: <b id="level">1</b></div>
+        <div>Уровень: <b id="level">1</b></div>
     </div>
 
     <div class="nav">
         <button class="nav-btn active" onclick="switchTab('match-tab')">🏟️ Матч</button>
-        <button class="nav-btn" onclick="switchTab('squad-tab')">📋 Команда</button>
+        <button class="nav-btn" onclick="switchTab('squad-tab')">📋 Состав</button>
         <button class="nav-btn" onclick="switchTab('league-tab')">🏆 Лига</button>
         <button class="nav-btn" onclick="switchTab('market-tab')">🛒 Рынок</button>
-        <button class="nav-btn" onclick="switchTab('store-tab')">🎁 Магазин</button>
+        <button class="nav-btn" onclick="switchTab('store-tab')">🎁 Магазин Паков</button>
     </div>
 
     <div id="match-tab" class="tab-content active">
         <div class="controls-bar">
-            <label>Схема:</label>
+            <label>Тактика:</label>
             <select id="formation-select" onchange="changeFormation(this.value)">
                 <option value="4-3-3">4-3-3</option>
                 <option value="4-4-2">4-4-2</option>
@@ -72,29 +35,33 @@
                 <option value="5-3-2">5-3-2</option>
             </select>
             <div>Сила: <b id="team-power">0</b></div>
-            <button class="btn btn-green" style="margin-left:auto;" onclick="playMatch()">Сыграть матч (1⚡)</button>
+            <button class="btn btn-green" id="play-btn" style="margin-left:auto;" onclick="playMatch()">Сыграть матч (1⚡)</button>
         </div>
 
-        <div class="pitch" id="pitch">
-            <div class="pitch-line"></div>
-            <div class="pitch-circle"></div>
+        <div class="pitch-container">
+            <div class="pitch" id="pitch">
+                <div class="pitch-line"></div>
+                <div class="pitch-circle"></div>
+                <div class="halftime-banner" id="halftime-banner">ПЕРЕРЫВ<br><span id="halftime-score">0 - 0</span></div>
+            </div>
         </div>
 
-        <div style="margin-bottom:5px; font-weight:bold;">🎙️ Текстовая трансляция матча</div>
-        <div class="log-box" id="match-log">Ожидание начала матча...</div>
+        <div style="margin-bottom:5px; font-weight:bold; color:#8a99ad;">🎙️ Интерактивный Live-Трекер</div>
+        <div class="log-box" id="match-log">Готов к началу матча...</div>
     </div>
 
     <div id="squad-tab" class="tab-content">
+        <div style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <button class="btn" onclick="autoArrangeByPosition()">⚡ Авторасстановка</button>
+            <button class="btn" onclick="healAllPlayers()">🏥 Вылечить всех (100🪙)</button>
+            <button class="btn btn-danger" onclick="resetProgress()">🗑️ Сброс</button>
+        </div>
         <div class="squad-section">
-            <h3>Основной состав (11)</h3>
+            <h3>Стартовый состав (11)</h3>
             <div class="squad-grid" id="main-squad-list"></div>
         </div>
         <div class="squad-section">
-            <h3>Запасные (до 5)</h3>
-            <div class="squad-grid" id="bench-list"></div>
-        </div>
-        <div class="squad-section">
-            <h3>Резерв</h3>
+            <h3>Запасные и Резерв</h3>
             <div class="squad-grid" id="reserve-list"></div>
         </div>
     </div>
@@ -116,441 +83,34 @@
     </div>
 
     <div id="store-tab" class="tab-content">
-        <h3>Магазин паков</h3>
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button class="btn" onclick="buyPack('bronze', 200)">Бронзовый пак (200🪙)</button>
-            <button class="btn" onclick="buyPack('silver', 500)">Серебряный пак (500🪙)</button>
-            <button class="btn" onclick="buyPack('gold', 1200)">Золотой пак (1200🪙)</button>
+        <h3>Магазин Паков и Лутбоксов</h3>
+        <p style="font-size: 11px; color: #8a99ad; margin: 5px 0 15px 0;">Покупайте паки за вью-бонусы, монеты или TON.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <div class="pack-card">
+                <h4>Бронзовый Пак</h4>
+                <p>Шанс Легенды: 0.1%</p>
+                <br>
+                <button class="btn" onclick="buyPack('bronze', 200)">200 🪙 / 1 TON</button>
+                <div class="pack-limit">Без лимита</div>
+            </div>
+            <div class="pack-card">
+                <h4>Серебряный Пак</h4>
+                <p>Шанс Легенды: 1.0%</p>
+                <br>
+                <button class="btn" onclick="buyPack('silver', 500)">500 🪙 / 5 TON</button>
+                <div class="pack-limit">Осталось сегодня: <b id="silver-limit">5</b>/5</div>
+            </div>
+            <div class="pack-card" style="border-color: #ffd700;">
+                <h4 style="color: #ffd700;">Золотой Пак</h4>
+                <p>Шанс Легенды: 3.0%</p>
+                <br>
+                <button class="btn btn-green" onclick="buyPack('gold', 1200)">1200 🪙 / 10 TON</button>
+                <div class="pack-limit">Осталось сегодня: <b id="gold-limit">2</b>/2</div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const NATIONALITIES = [
-            { country: 'Россия', flag: '🇷🇺', names: ['Иванов', 'Смирнов', 'Кузнецов', 'Попов', 'Соколов'] },
-            { country: 'Германия', flag: '🇩🇪', names: ['Шмидт', 'Мюллер', 'Шнайдер', 'Вебер', 'Фишер'] },
-            { country: 'Португалия', flag: '🇵🇹', names: ['Силва', 'Фернандеш', 'Кошта', 'Перейра', 'Невеш'] },
-            { country: 'Испания', flag: '🇪🇸', names: ['Гарсия', 'Торрес', 'Лопес', 'Родригес', 'Мартинес'] },
-            { country: 'Франция', flag: '🇫🇷', names: ['Дюпон', 'Моро', 'Лоран', 'Бернар', 'Жиро'] },
-            { country: 'Англия', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', names: ['Смит', 'Джонсон', 'Браун', 'Тейлор', 'Уилсон'] },
-            { country: 'Бразилия', flag: '🇧🇷', names: ['Силва', 'Сантос', 'Оливейра', 'Соуза', 'Лима'] },
-            { country: 'Аргентина', flag: '🇦🇷', names: ['Гомес', 'Диас', 'Альварес', 'Ромеро', 'Торрес'] }
-        ];
-
-        const POSITIONS = ['GK', 'CB', 'LB', 'RB', 'CM', 'LM', 'RM', 'CAM', 'ST'];
-
-        let gameState = {
-            coins: 1000,
-            gram: 0,
-            energy: 25,
-            level: 1,
-            division: 3,
-            tour: 1,
-            formation: '4-3-3',
-            mainSquad: [],
-            bench: [],
-            reserve: [],
-            market: [],
-            leagueTable: []
-        };
-
-        function generatePlayer(minRating = 55, maxRating = 69) {
-            const nat = NATIONALITIES[Math.floor(Math.random() * NATIONALITIES.length)];
-            const name = nat.names[Math.floor(Math.random() * nat.names.length)];
-            const pos = POSITIONS[Math.floor(Math.random() * POSITIONS.length)];
-            const baseRating = Math.floor(Math.random() * (maxRating - minRating + 1)) + minRating;
-            
-            let tier = 'bronze';
-            if (baseRating >= 80) tier = 'gold';
-            else if (baseRating >= 70) tier = 'silver';
-
-            return {
-                id: 'p_' + Math.random().toString(36).substr(2, 9),
-                name: name,
-                country: nat.country,
-                flag: nat.flag,
-                position: pos,
-                baseRating: baseRating,
-                stars: 0,
-                tier: tier
-            };
-        }
-
-        function getPlayerRating(player) {
-            return player.baseRating + player.stars;
-        }
-
-        function initStarterSquad() {
-            gameState.mainSquad = [];
-            gameState.bench = [];
-            for(let i=0; i<11; i++) {
-                gameState.mainSquad.push(generatePlayer(58, 65));
-            }
-            for(let i=0; i<3; i++) {
-                gameState.bench.push(generatePlayer(55, 62));
-            }
-        }
-
-        function initLeagueTable() {
-            const botTeams = ['ФК Заря', 'ФК Мюнхен', 'ФК Мадрид', 'ФК Неаполь', 'ФК Лион', 'ФК Порту', 'ФК Аякс', 'ФК Милан', 'ФК Лондон', 'ФК Севилья'];
-            gameState.leagueTable = [
-                { name: 'Вы (Ваш Клуб)', w: 0, d: 0, l: 0, pts: 0, isUser: true }
-            ];
-            botTeams.forEach(t => {
-                gameState.leagueTable.push({ name: t, w: 0, d: 0, l: 0, pts: 0, isUser: false });
-            });
-        }
-
-        function getTeamPower() {
-            if (!gameState.mainSquad || gameState.mainSquad.length === 0) return 0;
-            const sum = gameState.mainSquad.reduce((acc, p) => acc + getPlayerRating(p), 0);
-            return Math.round(sum / gameState.mainSquad.length);
-        }
-
-        function updateUI() {
-            document.getElementById('coins').innerText = gameState.coins;
-            document.getElementById('gram').innerText = gameState.gram;
-            document.getElementById('energy').innerText = gameState.energy;
-            document.getElementById('level').innerText = gameState.level;
-            document.getElementById('league-div').innerText = gameState.division;
-            document.getElementById('current-tour').innerText = gameState.tour;
-
-            renderPitch();
-            renderSquadLists();
-            renderLeagueTable();
-            renderMarket();
-        }
-
-        function renderPitch() {
-            const pitch = document.getElementById('pitch');
-            if (!pitch) return;
-            const cards = pitch.querySelectorAll('.player-position');
-            cards.forEach(c => c.remove());
-
-            document.getElementById('team-power').innerText = getTeamPower();
-
-            const layout = getFormationCoordinates(gameState.formation);
-            gameState.mainSquad.forEach((player, index) => {
-                if (index < 11) {
-                    const pos = layout[index] || { top: 50, left: 50 };
-                    const el = document.createElement('div');
-                    el.className = 'player-position';
-                    el.style.top = pos.top + '%';
-                    el.style.left = pos.left + '%';
-                    el.innerHTML = renderCardHTML(player);
-                    pitch.appendChild(el);
-                }
-            });
-        }
-
-        function getFormationCoordinates(fmt) {
-            if (fmt === '4-4-2') {
-                return [
-                    {top: 88, left: 50},
-                    {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85},
-                    {top: 45, left: 15}, {top: 45, left: 38}, {top: 45, left: 62}, {top: 45, left: 85},
-                    {top: 18, left: 35}, {top: 18, left: 65}
-                ];
-            } else if (fmt === '3-5-2') {
-                return [
-                    {top: 88, left: 50},
-                    {top: 72, left: 25}, {top: 74, left: 50}, {top: 72, left: 75},
-                    {top: 48, left: 15}, {top: 45, left: 32}, {top: 48, left: 50}, {top: 45, left: 68}, {top: 48, left: 85},
-                    {top: 18, left: 35}, {top: 18, left: 65}
-                ];
-            } else if (fmt === '5-3-2') {
-                return [
-                    {top: 88, left: 50},
-                    {top: 70, left: 12}, {top: 72, left: 31}, {top: 74, left: 50}, {top: 72, left: 69}, {top: 70, left: 88},
-                    {top: 45, left: 25}, {top: 48, left: 50}, {top: 45, left: 75},
-                    {top: 18, left: 35}, {top: 18, left: 65}
-                ];
-            }
-            return [
-                {top: 88, left: 50},
-                {top: 70, left: 15}, {top: 72, left: 38}, {top: 72, left: 62}, {top: 70, left: 85},
-                {top: 45, left: 25}, {top: 48, left: 50}, {top: 45, left: 75},
-                {top: 20, left: 20}, {top: 15, left: 50}, {top: 20, left: 80}
-            ];
-        }
-
-        function renderCardHTML(player, actionBtn = '') {
-            const stars = '★'.repeat(player.stars) + '☆'.repeat(5 - player.stars);
-            return `
-                <div class="card tier-${player.tier}">
-                    <div class="card-rating">${getPlayerRating(player)}</div>
-                    <div>${player.flag} ${player.name}</div>
-                    <div style="font-size:9px; color:#aaa;">${player.position}</div>
-                    <div class="card-stars">${stars}</div>
-                    ${actionBtn}
-                </div>
-            `;
-        }
-
-        function renderSquadLists() {
-            const mainContainer = document.getElementById('main-squad-list');
-            const benchContainer = document.getElementById('bench-list');
-            const reserveContainer = document.getElementById('reserve-list');
-
-            if (!mainContainer || !benchContainer || !reserveContainer) return;
-
-            mainContainer.innerHTML = '';
-            benchContainer.innerHTML = '';
-            reserveContainer.innerHTML = '';
-
-            gameState.mainSquad.forEach((p, idx) => {
-                mainContainer.innerHTML += renderCardHTML(p, `<button onclick="moveToBench(${idx})" style="font-size:9px; margin-top:3px;">В Запас</button> <button onclick="upgradePlayer('${p.id}')" style="font-size:9px;">+★ (100🪙)</button>`);
-            });
-
-            gameState.bench.forEach((p, idx) => {
-                benchContainer.innerHTML += renderCardHTML(p, `<button onclick="moveToMain(${idx})" style="font-size:9px; margin-top:3px;">В Старт</button> <button onclick="moveToReserveFromBench(${idx})" style="font-size:9px;">В Резерв</button>`);
-            });
-
-            gameState.reserve.forEach((p, idx) => {
-                reserveContainer.innerHTML += renderCardHTML(p, `<button onclick="moveToBenchFromReserve(${idx})" style="font-size:9px; margin-top:3px;">В Запас</button> <button onclick="sellPlayer('${p.id}')" style="font-size:9px;">Продать</button>`);
-            });
-        }
-
-        function moveToBench(index) {
-            const p = gameState.mainSquad.splice(index, 1)[0];
-            gameState.bench.push(p);
-            updateUI();
-        }
-
-        function moveToMain(index) {
-            if (gameState.mainSquad.length >= 11) {
-                alert('В основном составе уже 11 игроков!');
-                return;
-            }
-            const p = gameState.bench.splice(index, 1)[0];
-            gameState.mainSquad.push(p);
-            updateUI();
-        }
-
-        function moveToReserveFromBench(index) {
-            const p = gameState.bench.splice(index, 1)[0];
-            gameState.reserve.push(p);
-            updateUI();
-        }
-
-        function moveToBenchFromReserve(index) {
-            const p = gameState.reserve.splice(index, 1)[0];
-            gameState.bench.push(p);
-            updateUI();
-        }
-
-        function upgradePlayer(id) {
-            let p = gameState.mainSquad.find(x => x.id === id);
-            if (!p) return;
-            if (p.stars >= 5) {
-                alert('Достигнут максимум прокачки (5 звезд)!');
-                return;
-            }
-            if (gameState.coins < 100) {
-                alert('Недостаточно монет! Нужен 100 🪙');
-                return;
-            }
-            gameState.coins -= 100;
-            p.stars += 1;
-            updateUI();
-        }
-
-        function changeFormation(fmt) {
-            gameState.formation = fmt;
-            renderPitch();
-        }
-
-        function playMatch() {
-            if (gameState.energy < 1) {
-                alert('Недостаточно энергии ⚡!');
-                return;
-            }
-            if (gameState.mainSquad.length < 11) {
-                alert('В основном составе должно быть ровно 11 игроков!');
-                return;
-            }
-
-            gameState.energy -= 1;
-            const log = document.getElementById('match-log');
-            log.innerHTML = '<b>Матч начался!</b><br>';
-
-            const userPower = getTeamPower();
-            const opponentPower = 60 + (gameState.division * 3) + Math.floor(Math.random() * 5);
-
-            let userGoals = 0;
-            let oppGoals = 0;
-
-            let minutes = [12, 28, 41, 55, 73, 86];
-            minutes.forEach(min => {
-                const chance = Math.random() * (userPower + opponentPower);
-                if (chance < userPower) {
-                    if (Math.random() > 0.4) {
-                        userGoals++;
-                        const scorer = gameState.mainSquad[Math.floor(Math.random() * gameState.mainSquad.length)];
-                        log.innerHTML += `${min}' ⚽ <b>ГОЛ!</b> ${scorer.flag} ${scorer.name} забивает мяч! (${userGoals}:${oppGoals})<br>`;
-                    } else {
-                        log.innerHTML += `${min}' 🧤 Опасный момент у ворот соперника, но вратарь спасает!<br>`;
-                    }
-                } else {
-                    if (Math.random() > 0.5) {
-                        oppGoals++;
-                        log.innerHTML += `${min}' ⚽ <b>ГОЛ Соперника!</b> Пропуск в обороне. (${userGoals}:${oppGoals})<br>`;
-                    } else {
-                        log.innerHTML += `${min}' 🟨 Фол в центре поля.<br>`;
-                    }
-                }
-            });
-
-            let userTeamInTable = gameState.leagueTable.find(t => t.isUser);
-            if (userGoals > oppGoals) {
-                log.innerHTML += `<br><b>Финальный свисток! ПОБЕДА ${userGoals}:${oppGoals}! +3 очка, +30 🪙</b>`;
-                userTeamInTable.w += 1;
-                userTeamInTable.pts += 3;
-                gameState.coins += 30;
-            } else if (userGoals === oppGoals) {
-                log.innerHTML += `<br><b>Финальный свисток! Ничья ${userGoals}:${oppGoals}. +1 очко, +15 🪙</b>`;
-                userTeamInTable.d += 1;
-                userTeamInTable.pts += 1;
-                gameState.coins += 15;
-            } else {
-                log.innerHTML += `<br><b>Финальный свисток! Поражение ${userGoals}:${oppGoals}. +5 🪙</b>`;
-                userTeamInTable.l += 1;
-                gameState.coins += 5;
-            }
-
-            simulateBotMatches();
-            gameState.tour += 1;
-
-            if (gameState.tour > 38) {
-                finishSeason();
-            }
-
-            updateUI();
-        }
-
-        function simulateBotMatches() {
-            gameState.leagueTable.forEach(team => {
-                if (!team.isUser) {
-                    const res = Math.random();
-                    if (res > 0.5) { team.w += 1; team.pts += 3; }
-                    else if (res > 0.25) { team.d += 1; team.pts += 1; }
-                    else { team.l += 1; }
-                }
-            });
-            gameState.leagueTable.sort((a, b) => b.pts - a.pts);
-        }
-
-        function renderLeagueTable() {
-            const body = document.getElementById('league-table-body');
-            if (!body) return;
-            body.innerHTML = '';
-            gameState.leagueTable.forEach((team, idx) => {
-                let rowClass = '';
-                if (idx < 2) rowClass = 'promo';
-                if (idx >= 8) rowClass = 'relegation';
-
-                body.innerHTML += `
-                    <tr class="${rowClass}">
-                        <td>${idx + 1}</td>
-                        <td>${team.isUser ? '<b>' + team.name + '</b>' : team.name}</td>
-                        <td>${team.w}</td>
-                        <td>${team.d}</td>
-                        <td>${team.l}</td>
-                        <td><b>${team.pts}</b></td>
-                    </tr>
-                `;
-            });
-        }
-
-        function finishSeason() {
-            const userIndex = gameState.leagueTable.findIndex(t => t.isUser);
-            let msg = `Сезон завершен! Вы заняли ${userIndex + 1} место. `;
-            
-            if (userIndex < 2) {
-                msg += 'Поздравляем! Вы поднимаетесь в высший дивизион и получаете +50 💎!';
-                gameState.division = Math.max(1, gameState.division - 1);
-                gameState.gram += 50;
-            } else if (userIndex >= 8) {
-                msg += 'К сожалению, ваша команда вылетает в дивизион ниже.';
-                gameState.division += 1;
-            }
-
-            alert(msg);
-            gameState.tour = 1;
-            initLeagueTable();
-        }
-
-        function buyPack(type, price) {
-            if (gameState.coins < price) {
-                alert('Недостаточно монет!');
-                return;
-            }
-            gameState.coins -= price;
-
-            let player;
-            if (type === 'bronze') player = generatePlayer(50, 69);
-            else if (type === 'silver') player = generatePlayer(70, 79);
-            else if (type === 'gold') player = generatePlayer(80, 92);
-
-            gameState.reserve.push(player);
-            alert(`🎉 Из пака выпал: ${player.flag} ${player.name} (${player.position}, Рейтинг: ${player.baseRating})! Отправлен в Резерв.`);
-            updateUI();
-        }
-
-        function refreshMarket() {
-            gameState.market = [
-                generatePlayer(65, 75),
-                generatePlayer(70, 82),
-                generatePlayer(78, 88)
-            ];
-        }
-
-        function renderMarket() {
-            const marketContainer = document.getElementById('market-list');
-            if (!marketContainer) return;
-            marketContainer.innerHTML = '';
-            gameState.market.forEach((p, idx) => {
-                const price = getPlayerRating(p) * 15;
-                marketContainer.innerHTML += renderCardHTML(p, `<button onclick="buyFromMarket(${idx}, ${price})" style="font-size:9px; margin-top:3px;">Купить (${price}🪙)</button>`);
-            });
-        }
-
-        function buyFromMarket(index, price) {
-            if (gameState.coins < price) {
-                alert('Недостаточно монет!');
-                return;
-            }
-            gameState.coins -= price;
-            const p = gameState.market.splice(index, 1)[0];
-            gameState.reserve.push(p);
-            updateUI();
-        }
-
-        function sellPlayer(id) {
-            const idx = gameState.reserve.findIndex(p => p.id === id);
-            if (idx === -1) return;
-            const p = gameState.reserve[idx];
-            const price = Math.round(getPlayerRating(p) * 8);
-            gameState.coins += price;
-            gameState.reserve.splice(idx, 1);
-            updateUI();
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            const targetTab = document.getElementById(tabId);
-            if (targetTab) targetTab.classList.add('active');
-
-            if (window.event && window.event.target) {
-                window.event.target.classList.add('active');
-            }
-        }
-
-        initStarterSquad();
-        initLeagueTable();
-        refreshMarket();
-        updateUI();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
+
