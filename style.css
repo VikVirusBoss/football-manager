@@ -1,26 +1,87 @@
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-body { background: #0a0e14; color: #fff; padding: 10px; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body { background-color: #0b131e; color: #ffffff; padding: 10px; user-select: none; }
 
-.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal { background: #1a2638; padding: 20px; border-radius: 15px; text-align: center; width: 100%; }
-.match-event-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; pointer-events: none; font-size: 24px; font-weight: bold; color: #ffd700; text-align: center; text-shadow: 0 0 10px #000; }
+/* Модальные окна */
+.overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(5, 10, 15, 0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: #16222f; border: 1px solid #2a3a4e; border-radius: 16px; padding: 24px; text-align: center; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+.modal h2 { margin-bottom: 10px; color: #00e676; }
+.modal p { font-size: 14px; color: #94a3b8; margin-bottom: 20px; }
+.modal input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #fff; font-size: 16px; margin-bottom: 15px; text-align: center; outline: none; }
 
-.header { display: flex; justify-content: space-between; padding: 10px; background: #16202e; border-radius: 10px; margin-bottom: 10px; }
-.nav { display: flex; gap: 5px; overflow-x: auto; margin-bottom: 10px; }
-.nav-btn { flex: 1; padding: 8px; background: #1a2638; border: none; color: #fff; border-radius: 5px; white-space: nowrap; }
-.nav-btn.active { background: #00e676; color: #000; }
+/* Кнопки */
+.btn { border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 14px; transition: 0.2s; width: 100%; }
+.btn-green { background: #00e676; color: #051014; }
+.btn-green:hover { background: #00c853; }
+
+/* Анимация сундука */
+.chest { font-size: 80px; margin: 20px 0; cursor: pointer; display: inline-block; transition: transform 0.2s; }
+.chest:active { transform: scale(0.9); }
+.chest-shake { animation: shake 0.5s infinite; }
+@keyframes shake {
+    0% { transform: rotate(0deg); }
+    20% { transform: rotate(-10deg); }
+    40% { transform: rotate(10deg); }
+    60% { transform: rotate(-10deg); }
+    80% { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Шапка и Навигация */
+.header { display: flex; justify-content: space-between; align-items: center; background: #16222f; padding: 12px 16px; border-radius: 12px; margin-bottom: 12px; }
+.stats { display: flex; gap: 15px; font-size: 14px; }
+.club-title { font-weight: bold; color: #00e676; }
+
+.nav { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 15px; padding-bottom: 4px; }
+.nav-btn { flex: 1; min-width: 70px; padding: 10px 6px; background: #16222f; border: 1px solid #243447; color: #94a3b8; border-radius: 8px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.nav-btn.active { background: #00e676; color: #0b131e; font-weight: bold; border-color: #00e676; }
 
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-.pitch { position: relative; width: 100%; height: 400px; background: #2e7d32; border: 2px solid #fff; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-.pitch::after { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.3); }
+/* Игровое Поле */
+.pitch { position: relative; width: 100%; height: 420px; background: #1e7e34; border: 3px solid #ffffff; border-radius: 12px; margin: 12px 0; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.3); }
+.pitch-line.center-line { position: absolute; top: 50%; left: 0; width: 100%; height: 2px; background: rgba(255,255,255,0.7); }
+.pitch-circle { position: absolute; top: 50%; left: 50%; width: 80px; height: 80px; border: 2px solid rgba(255,255,255,0.7); border-radius: 50%; transform: translate(-50%, -50%); }
+.penalty-area { position: absolute; left: 50%; width: 140px; height: 60px; border: 2px solid rgba(255,255,255,0.7); transform: translateX(-50%); }
+.top-area { top: 0; border-top: none; }
+.bottom-area { bottom: 0; border-bottom: none; }
 
-.card { width: 50px; background: #1a2638; border: 1px solid #333; padding: 5px; font-size: 8px; text-align: center; position: absolute; transform: translate(-50%, -50%); }
-.player-avatar { width: 30px; height: 30px; border-radius: 50%; display: block; margin: 0 auto; background: #fff; }
-.injury-mark { position: absolute; top: 0; right: 0; color: red; font-weight: bold; font-size: 14px; }
+/* Карточка игрока на поле */
+.pitch-player { position: absolute; transform: translate(-50%, -50%); text-align: center; width: 60px; z-index: 10; transition: all 0.5s ease; }
+.player-avatar { width: 42px; height: 42px; border-radius: 50%; background: #ffffff; border: 2px solid #00e676; display: block; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.4); }
+.player-name-tag { background: rgba(15, 23, 42, 0.85); font-size: 10px; padding: 2px 4px; border-radius: 4px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+.injury-icon { position: absolute; top: -5px; right: 5px; color: #ff1744; font-size: 16px; font-weight: bold; text-shadow: 0 0 4px #000; }
 
-.squad-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 10px; }
-.btn { background: #00e676; border: none; padding: 10px; border-radius: 5px; font-weight: bold; width: 100%; margin-top: 10px; }
-.log-box { height: 100px; background: #000; font-size: 12px; overflow-y: scroll; padding: 5px; border: 1px solid #333; }
-           
+/* Баннер Событий */
+.match-banner { position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); background: rgba(11, 19, 30, 0.95); border: 2px solid #00e676; padding: 15px 30px; border-radius: 12px; font-size: 22px; font-weight: bold; color: #ffd700; text-align: center; z-index: 2000; box-shadow: 0 0 20px #00e676; animation: popIn 0.3s ease; }
+@keyframes popIn { 0% { transform: translate(-50%, -50%) scale(0.5); } 100% { transform: translate(-50%, -50%) scale(1); } }
+
+/* Сетка Состава и Карточки */
+.squad-section { margin-bottom: 20px; }
+.squad-section h3 { font-size: 14px; color: #94a3b8; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 4px; }
+.squad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.player-card { background: #16222f; border: 1px solid #243447; border-radius: 8px; padding: 8px; text-align: center; position: relative; }
+.player-card img { width: 45px; height: 45px; border-radius: 50%; background: #fff; margin-bottom: 4px; }
+.player-card .p-name { font-size: 12px; font-weight: bold; }
+.player-card .p-pos { font-size: 10px; color: #00e676; }
+
+/* Лог и Таблица */
+.match-scoreboard { text-align: center; font-size: 16px; font-weight: bold; color: #00e676; background: #16222f; padding: 8px; border-radius: 8px; }
+.match-controls { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; gap: 10px; }
+.match-controls select { background: #16222f; color: #fff; border: 1px solid #243447; padding: 6px; border-radius: 6px; }
+.log-box { background: #080d14; border: 1px solid #1e293b; height: 90px; border-radius: 8px; padding: 8px; font-size: 11px; overflow-y: auto; color: #cbd5e1; font-family: monospace; }
+.log-title { font-size: 12px; color: #64748b; margin-top: 8px; }
+
+.table-scroll { overflow-x: auto; }
+.league-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.league-table th, .league-table td { padding: 8px; border-bottom: 1px solid #1e293b; }
+.league-table tr.my-club { background: rgba(0, 230, 118, 0.15); color: #00e676; font-weight: bold; }
+.zone-up { border-left: 3px solid #00e676; }
+.zone-down { border-left: 3px solid #ff1744; }
+
+.schedule-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+.schedule-item { background: #16222f; padding: 8px; border-radius: 6px; font-size: 12px; display: flex; justify-content: space-between; }
+
+.store-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 12px; }
+.store-card { background: #16222f; border: 1px solid #243447; border-radius: 12px; padding: 16px; text-align: center; }
+.store-icon { font-size: 40px; margin-bottom: 8px; }
