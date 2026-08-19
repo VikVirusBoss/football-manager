@@ -3,114 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Football League Pro</title>
+    <title>Football Manager</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!-- Экран настройки (первый запуск) -->
+    <div id="setup-screen" class="overlay">
+        <div class="modal">
+            <h2>Добро пожаловать!</h2>
+            <input type="text" id="club-name-input" placeholder="Название вашего клуба">
+            <button class="btn" onclick="initClub()">Создать клуб</button>
+        </div>
+    </div>
+
+    <!-- Анпакинг (первый запуск) -->
+    <div id="pack-screen" class="overlay" style="display:none;">
+        <div class="modal" id="pack-modal">
+            <h2 id="pack-title">Откройте пак!</h2>
+            <div id="pack-content" class="squad-grid"></div>
+            <button class="btn" onclick="nextPackStep()">Далее</button>
+        </div>
+    </div>
+
+    <!-- Оверлей обучения -->
+    <div id="tutorial-overlay" class="overlay" style="display:none; z-index: 9999;">
+        <div class="tutorial-box">
+            <h2 id="tut-title">Добро пожаловать!</h2>
+            <p id="tut-text">Это ваш клуб.</p>
+            <button class="btn" onclick="nextTutorial()">Понятно</button>
+        </div>
+    </div>
+
+    <!-- Экран матча: Плашка событий -->
+    <div id="match-event-overlay" class="match-event-overlay"></div>
 
     <div class="header">
         <div class="stat-box">
             <span class="stat">⚡ <span id="energy">25</span>/25</span>
             <span class="stat">🪙 <span id="coins">1000</span></span>
-            <span class="stat">💎 <span id="gram">0</span></span>
         </div>
-        <div>Уровень: <b id="level">1</b></div>
+        <div id="club-display">Ваш Клуб</div>
     </div>
 
     <div class="nav">
-        <button class="nav-btn active" onclick="switchTab('match-tab')">🏟️ Матч</button>
-        <button class="nav-btn" onclick="switchTab('squad-tab')">📋 Состав</button>
-        <button class="nav-btn" onclick="switchTab('league-tab')">🏆 Лига</button>
-        <button class="nav-btn" onclick="switchTab('market-tab')">🛒 Рынок</button>
-        <button class="nav-btn" onclick="switchTab('store-tab')">🎁 Магазин Паков</button>
+        <button class="nav-btn active" id="nav-match" onclick="switchTab('match-tab')">🏟️ Матч</button>
+        <button class="nav-btn" id="nav-squad" onclick="switchTab('squad-tab')">📋 Состав</button>
+        <button class="nav-btn" id="nav-league" onclick="switchTab('league-tab')">🏆 Лига</button>
+        <button class="nav-btn" id="nav-market" onclick="switchTab('market-tab')">🛒 Рынок</button>
+        <button class="nav-btn" id="nav-store" onclick="switchTab('store-tab')">🎁 Магазин</button>
     </div>
 
     <div id="match-tab" class="tab-content active">
+        <div class="match-header" id="match-header"></div>
         <div class="controls-bar">
-            <label>Тактика:</label>
             <select id="formation-select" onchange="changeFormation(this.value)">
-                <option value="4-3-3">4-3-3</option>
-                <option value="4-4-2">4-4-2</option>
-                <option value="3-5-2">3-5-2</option>
-                <option value="5-3-2">5-3-2</option>
+                <option value="4-3-3">4-3-3</option><option value="4-4-2">4-4-2</option>
+                <option value="3-5-2">3-5-2</option><option value="5-3-2">5-3-2</option>
             </select>
-            <div>Сила: <b id="team-power">0</b></div>
-            <button class="btn btn-green" id="play-btn" style="margin-left:auto;" onclick="playMatch()">Сыграть матч (1⚡)</button>
+            <button class="btn btn-green" id="play-btn" onclick="playMatch()">Сыграть</button>
         </div>
-
-        <div class="pitch-container">
-            <div class="pitch" id="pitch">
-                <div class="pitch-line"></div>
-                <div class="pitch-circle"></div>
-                <div class="halftime-banner" id="halftime-banner">ПЕРЕРЫВ<br><span id="halftime-score">0 - 0</span></div>
-            </div>
-        </div>
-
-        <div style="margin-bottom:5px; font-weight:bold; color:#8a99ad;">🎙️ Интерактивный Live-Трекер</div>
-        <div class="log-box" id="match-log">Готов к началу матча...</div>
+        <div class="pitch" id="pitch"></div>
+        <div class="log-box" id="match-log">Готов к матчу.</div>
     </div>
 
     <div id="squad-tab" class="tab-content">
-        <div style="margin-bottom: 10px; display: flex; gap: 10px; flex-wrap: wrap;">
-            <button class="btn" onclick="autoArrangeByPosition()">⚡ Авторасстановка</button>
-            <button class="btn" onclick="healAllPlayers()">🏥 Вылечить всех (100🪙)</button>
-            <button class="btn btn-danger" onclick="resetProgress()">🗑️ Сброс</button>
-        </div>
-        <div class="squad-section">
-            <h3>Стартовый состав (11)</h3>
-            <div class="squad-grid" id="main-squad-list"></div>
-        </div>
-        <div class="squad-section">
-            <h3>Запасные и Резерв</h3>
-            <div class="squad-grid" id="reserve-list"></div>
-        </div>
+        <h3>Основа (11)</h3><div class="squad-grid" id="main-squad-list"></div>
+        <h3>Запасные (на матч)</h3><div class="squad-grid" id="subs-list"></div>
+        <h3>Резерв</h3><div class="squad-grid" id="reserve-list"></div>
     </div>
 
     <div id="league-tab" class="tab-content">
-        <h3>Дивизион <span id="league-div">3</span> | Тур <span id="current-tour">1</span>/38</h3>
-        <br>
-        <table>
-            <thead>
-                <tr><th>#</th><th>Клуб</th><th>В</th><th>Н</th><th>П</th><th>Очки</th></tr>
-            </thead>
-            <tbody id="league-table-body"></tbody>
-        </table>
+        <h3>Турнирная таблица</h3>
+        <table id="league-table"></table>
+        <h3>Календарь (Расписание)</h3>
+        <div id="schedule-list"></div>
     </div>
 
     <div id="market-tab" class="tab-content">
         <h3>Трансферный рынок</h3>
-        <div class="squad-grid" id="market-list" style="margin-top:10px;"></div>
+        <div class="squad-grid" id="market-list"></div>
     </div>
 
     <div id="store-tab" class="tab-content">
-        <h3>Магазин Паков и Лутбоксов</h3>
-        <p style="font-size: 11px; color: #8a99ad; margin: 5px 0 15px 0;">Покупайте паки за вью-бонусы, монеты или TON.</p>
-        <div style="display:flex; gap:12px; flex-wrap:wrap;">
-            <div class="pack-card">
-                <h4>Бронзовый Пак</h4>
-                <p>Шанс Легенды: 0.1%</p>
-                <br>
-                <button class="btn" onclick="buyPack('bronze', 200)">200 🪙 / 1 TON</button>
-                <div class="pack-limit">Без лимита</div>
-            </div>
-            <div class="pack-card">
-                <h4>Серебряный Пак</h4>
-                <p>Шанс Легенды: 1.0%</p>
-                <br>
-                <button class="btn" onclick="buyPack('silver', 500)">500 🪙 / 5 TON</button>
-                <div class="pack-limit">Осталось сегодня: <b id="silver-limit">5</b>/5</div>
-            </div>
-            <div class="pack-card" style="border-color: #ffd700;">
-                <h4 style="color: #ffd700;">Золотой Пак</h4>
-                <p>Шанс Легенды: 3.0%</p>
-                <br>
-                <button class="btn btn-green" onclick="buyPack('gold', 1200)">1200 🪙 / 10 TON</button>
-                <div class="pack-limit">Осталось сегодня: <b id="gold-limit">2</b>/2</div>
-            </div>
-        </div>
+        <h3>Магазин Паков</h3>
+        <div class="squad-grid"><button class="btn" onclick="buyPack('silver', 500)">Серебро (500🪙)</button></div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
